@@ -1,0 +1,91 @@
+<!DOCTYPE HTML>
+
+<html>
+	<head>
+		<title>Leaderboard for {{guild_name}}</title>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex;
+        align-items: flex;
+        text-align: flex;
+        background-color: #242424;
+      }
+
+      h1 {
+        text-align: center; 
+        font-size:30pt;
+        font-family: Tw Cen MT, Lato, Helvetica, Roboto, sans-serif;
+        color: #f7f7f7;
+      }
+      h2 {
+        text-align: center; 
+        font-size: 15pt;
+        font-family: Arial Rounded MT, Lato, Helvetica, Roboto, sans-serif;
+        color: #d9d9d9
+      }
+
+      th {
+        background-color: #3a6b40;
+        color: white;
+      }
+      tr:nth-child(even) {background-color: #030303;}
+      tr:nth-child(odd) {background-color: #1a1a1a;}
+      // tr:nth-child(2) {background-color: #FFE3A1;}
+      th, td {
+        padding: 15px;
+        text-align: left;
+        font-size:14pt;
+        font-family: Arial Rounded MT, Lato, Helvetica, Roboto, sans-serif;
+        color: #f7f7f7;
+      }
+      tr:hover {
+        background-color: #1f1f1f;
+      }
+
+      table {
+        border-collapse: collapse;
+      }
+
+      text {
+        text-align: center; 
+        font-size: 10pt;
+        font-family: Arial Rounded MT, Lato, Helvetica, Roboto, sans-serif;
+        padding: 2.5em;  
+        color: #f7f7f7;      
+      }
+    </style>
+	</head>
+	<body>
+		<h1>
+      {{guild_name}}
+    </h1>
+    <h2>
+      Leaderboard
+    </h2>
+    <div>
+      <table style="width:100%"; text-align: left;>
+        <tr>
+          <th></th>
+          <th>👥 User</th>
+          <th>💬 Messages</th>
+          <th>🏆 XP</th>
+          <th>Level</th>
+        </tr>
+        {% for key, value in data.items() %}
+          <tr>
+            <td>{{ value[3] }}</td>
+            <td> {{ key }} </td>
+            <td> {{ value[0] }} </td>
+            <td> {{ value[1] }} </td>
+            <td> {{ value[2] }} </td>
+          </tr>
+        {% endfor %}
+      </table>
+    </div>
+    <text>
+      Powered by <b>TimMcBot.</b> <a target="popup" onclick="window.open('https://discord.com/oauth2/authorize?client_id=800377812699447306&permissions=4294967287&scope=bot%20applications.commands', 'Add TimMcBot', 'width=500,height=800')" style="text-decoration:none; color:#C2C5FF;">Click here</a> to add it to your discord server!
+    </text> 
+	</body>
+</html>

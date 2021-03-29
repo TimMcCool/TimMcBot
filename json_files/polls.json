@@ -1,0 +1,364 @@
+{
+    "806272849458495489": {
+        "825159708847505463": {
+            "name": "test",
+            "strict": false,
+            "url": "https://discord.com/channels/806272849458495489/818455648903626752/825159708847505463",
+            "author": 718811967342772285,
+            "ended": true,
+            "channel": 818455648903626752,
+            "options": [
+                "test",
+                "2",
+                "3",
+                "54t4tt4",
+                "454"
+            ]
+        },
+        "825164721178148884": {
+            "name": "test",
+            "strict": false,
+            "url": "https://discord.com/channels/806272849458495489/818455648903626752/825164721178148884",
+            "author": 718811967342772285,
+            "ended": false,
+            "channel": 818455648903626752,
+            "options": [
+                "Yes",
+                "No"
+            ]
+        },
+        "825167797964898334": {
+            "name": "test",
+            "strict": false,
+            "url": "https://discord.com/channels/806272849458495489/818455648903626752/825167797964898334",
+            "author": 718811967342772285,
+            "ended": true,
+            "channel": 818455648903626752,
+            "options": [
+                "Yes",
+                "No"
+            ]
+        },
+        "825329108275298324": {
+            "name": "test",
+            "strict": false,
+            "url": "https://discord.com/channels/806272849458495489/818455648903626752/825329108275298324",
+            "author": 718811967342772285,
+            "ended": true,
+            "channel": 818455648903626752,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "825344821925249044": {
+            "name": "Test",
+            "strict": true,
+            "url": "https://discord.com/channels/806272849458495489/818455648903626752/825344821925249044",
+            "author": 718811967342772285,
+            "ended": true,
+            "channel": 818455648903626752,
+            "options": [
+                "Test",
+                "t4fr",
+                "erfef",
+                "erferfref",
+                "efef",
+                "efe"
+            ]
+        },
+        "825345789302931466": {
+            "name": "test",
+            "strict": false,
+            "url": "https://discord.com/channels/806272849458495489/818455648903626752/825345789302931466",
+            "author": 718811967342772285,
+            "ended": false,
+            "channel": 818455648903626752,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "825346040932335626": {
+            "name": "terfefeferferferferferf",
+            "strict": false,
+            "url": "https://discord.com/channels/806272849458495489/818455648903626752/825346040932335626",
+            "author": 718811967342772285,
+            "ended": true,
+            "channel": 818455648903626752,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "825363209237168188": {
+            "name": "test",
+            "strict": false,
+            "url": "https://discord.com/channels/806272849458495489/818455648903626752/825363209237168188",
+            "author": 718811967342772285,
+            "ended": false,
+            "channel": 818455648903626752,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "825363404083953684": {
+            "name": "test",
+            "strict": false,
+            "url": "https://discord.com/channels/806272849458495489/818455648903626752/825363404083953684",
+            "author": 718811967342772285,
+            "ended": false,
+            "channel": 818455648903626752,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "825363460903927868": {
+            "name": "test",
+            "strict": false,
+            "url": "https://discord.com/channels/806272849458495489/818455648903626752/825363460903927868",
+            "author": 718811967342772285,
+            "ended": true,
+            "channel": 818455648903626752,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "825450685105569834": {
+            "name": "test",
+            "strict": false,
+            "url": "https://discord.com/channels/806272849458495489/818455648903626752/825450685105569834",
+            "author": 718811967342772285,
+            "ended": true,
+            "channel": 818455648903626752,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "825802629425922099": {
+            "name": "test",
+            "strict": false,
+            "url": "https://discord.com/channels/806272849458495489/825089427781058643/825802629425922099",
+            "author": 718811967342772285,
+            "ended": true,
+            "channel": 825089427781058643,
+            "options": [
+                "test"
+            ]
+        },
+        "825804628817870959": {
+            "name": "test",
+            "strict": false,
+            "url": "https://discord.com/channels/806272849458495489/825089427781058643/825804628817870959",
+            "author": 718811967342772285,
+            "ended": false,
+            "channel": 825089427781058643,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "825804886125445180": {
+            "name": "test",
+            "strict": false,
+            "url": "https://discord.com/channels/806272849458495489/825089427781058643/825804886125445180",
+            "author": 718811967342772285,
+            "ended": true,
+            "channel": 825089427781058643,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "825804961198899241": {
+            "name": "test",
+            "strict": false,
+            "url": "https://discord.com/channels/806272849458495489/825089427781058643/825804961198899241",
+            "author": 718811967342772285,
+            "ended": true,
+            "channel": 825089427781058643,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "825805531990065202": {
+            "name": "1",
+            "strict": false,
+            "url": "https://discord.com/channels/806272849458495489/825089427781058643/825805531990065202",
+            "author": 718811967342772285,
+            "ended": false,
+            "channel": 825089427781058643,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "825805757575725106": {
+            "name": "test",
+            "strict": false,
+            "url": "https://discord.com/channels/806272849458495489/825089427781058643/825805757575725106",
+            "author": 718811967342772285,
+            "ended": false,
+            "channel": 825089427781058643,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "825805884697346059": {
+            "name": "test",
+            "strict": false,
+            "url": "https://discord.com/channels/806272849458495489/825089427781058643/825805884697346059",
+            "author": 718811967342772285,
+            "ended": false,
+            "channel": 825089427781058643,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "825806089672327219": {
+            "name": "test",
+            "strict": false,
+            "url": "https://discord.com/channels/806272849458495489/825089427781058643/825806089672327219",
+            "author": 718811967342772285,
+            "ended": false,
+            "channel": 825089427781058643,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "825806278483116092": {
+            "name": "tes5",
+            "strict": false,
+            "url": "https://discord.com/channels/806272849458495489/825089427781058643/825806278483116092",
+            "author": 718811967342772285,
+            "ended": false,
+            "channel": 825089427781058643,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "825807303587659806": {
+            "name": "test",
+            "strict": true,
+            "url": "https://discord.com/channels/806272849458495489/825089427781058643/825807303587659806",
+            "author": 718811967342772285,
+            "ended": true,
+            "channel": 825089427781058643,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "825819971900669973": {
+            "name": "test",
+            "strict": false,
+            "url": "https://discord.com/channels/806272849458495489/825089427781058643/825819971900669973",
+            "author": 718811967342772285,
+            "ended": true,
+            "channel": 825089427781058643,
+            "options": [
+                "ggzuvih9gvugzg87gftzcztgt87zu8z9hgvzugh",
+                "gzuvgzg8hzvuguzgvgh vzugvugizvu",
+                "gvjguhgivhigugovizgouvi",
+                "vigugvhjgiuvjg"
+            ]
+        },
+        "825822407713226772": {
+            "name": "test",
+            "strict": true,
+            "url": "https://discord.com/channels/806272849458495489/825089427781058643/825822407713226772",
+            "author": 718811967342772285,
+            "ended": false,
+            "channel": 825089427781058643,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "826121256200831017": {
+            "name": "test",
+            "strict": true,
+            "url": "https://discord.com/channels/806272849458495489/818455648903626752/826121256200831017",
+            "author": 718811967342772285,
+            "ended": false,
+            "channel": 818455648903626752,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "826179026170806282": {
+            "name": "test",
+            "strict": true,
+            "url": "https://discord.com/channels/806272849458495489/818455648903626752/826179026170806282",
+            "author": 718811967342772285,
+            "ended": true,
+            "channel": 818455648903626752,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        }
+    },
+    "740155791834873877": {
+        "825345052586147880": {
+            "name": "Dyno polls vs TimMcBot polls?",
+            "strict": true,
+            "url": "https://discord.com/channels/740155791834873877/748976910515830855/825345052586147880",
+            "author": 718811967342772285,
+            "ended": false,
+            "channel": 748976910515830855,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "825454820457840710": {
+            "name": "Do you use lightmode or darkmode?",
+            "strict": true,
+            "url": "https://discord.com/channels/740155791834873877/818866702879424556/825454820457840710",
+            "author": 718811967342772285,
+            "ended": false,
+            "channel": 818866702879424556,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "826132192169820231": {
+            "name": "Should I put TimMcBot on top.gg?",
+            "strict": true,
+            "url": "https://discord.com/channels/740155791834873877/748976910515830855/826132192169820231",
+            "author": 718811967342772285,
+            "ended": false,
+            "channel": 748976910515830855,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        }
+    },
+    "811073585740644352": {
+        "826120704030146600": {
+            "name": "test",
+            "strict": false,
+            "url": "https://discord.com/channels/811073585740644352/811788661283881030/826120704030146600",
+            "author": 718811967342772285,
+            "ended": true,
+            "channel": 811788661283881030,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        }
+    }
+}
