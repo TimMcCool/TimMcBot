@@ -210,7 +210,7 @@ async def help_cog(ctx, cog_name, prefix):
             this_cog_name = command.cog.qualified_name
         params = ""
         if this_cog_name == cog_name and not command.hidden:
-            for item in command.clean_params:
+            for item in list(command.clean_params):
                 params = f"{params} <{item}>"
             # embed.description += prefix+command.qualified_name+params+"\n"
             commandinfo = ""
@@ -219,15 +219,15 @@ async def help_cog(ctx, cog_name, prefix):
             try:
                 subcommands = None
                 for subcmd in command.commands:
-                    params = ""
+                    subcmd_params = ""
 
                     for item in subcmd.clean_params:
-                        params = f"{params} <{item}>"
+                        subcmd_params = f"{subcmd_params} <{item}>"
                     if subcommands == None:
-                        subcommands = "\n" + prefix + subcmd.qualified_name + params
+                        subcommands = "\n" + prefix + subcmd.qualified_name + subcmd_params
                     else:
                         subcommands = (
-                            subcommands + "\n" + prefix + subcmd.qualified_name + params
+                            subcommands + "\n" + prefix + subcmd.qualified_name + subcmd_params
                         )
                 commandinfo += "``````𝗦𝘂𝗯𝗰𝗼𝗺𝗺𝗮𝗻𝗱𝘀:" + subcommands
             except Exception:
@@ -361,6 +361,7 @@ async def prefix(ctx):
             color=get_client_color(ctx),
         )
         embed.set_author(name="⚙️ " + ctx.guild.name, icon_url=ctx.guild.icon_url)
+        embed.set_footer(text=f"{prefixes[1]}prefix add <prefix> | {prefixes[1]}prefix remove <prefix>")
         await ctx.send(embed=embed)
 
 
@@ -389,7 +390,7 @@ async def add(ctx, *, prefix):
             serversettings[str(ctx.guild.id)] = prefixes
             with open("json_files/prefixes.json", "w") as d:
                 json.dump(serversettings, d, indent=4)
-            await ctx.send(f"The prefix {prefix} has been sucessfully added!")
+            await ctx.send(f"The prefix {prefix} has been sucessfully added! 👌")
 
 
 @prefix.command(brief="Admins can remove a prefix with this command")
@@ -403,12 +404,11 @@ async def remove(ctx, *, prefix):
         if str(ctx.guild.id) in serversettings:
             prefixes = serversettings[str(ctx.guild.id)]
         else:
-            await ctx.send("That's not a TimMcBot prefix!")
-            return
+            prefixes = ["+"]
         if prefix in prefixes:
             if len(prefixes) == 1:
                 await ctx.send(
-                    f"There must be at least one prefix beside {client.user.mention}!"
+                    f"There must be **at least one** prefix beside {client.user.mention}! Please add another prefix before removing this one."
                 )
             else:
                 prefixes.remove(prefix)
@@ -564,7 +564,7 @@ async def send_dm(ctx, receiver: discord.User, message):
             color=discord.Color.random(),
             timestamp=datetime.datetime.now(),
         )
-        embed.set_author(name=f"🖊 {ctx.author}")
+        embed.set_author(name=f"🖊 Author: {ctx.author}")
         embed.set_thumbnail(url=ctx.author.avatar_url)
         embed.set_footer(text=f"Server: {ctx.guild.name}", icon_url=ctx.guild.icon_url)
         await channel.send(embed=embed)
@@ -591,17 +591,17 @@ async def no_dm(ctx, error):
 )
 async def invite(ctx):
     invite = discord.Embed(
-        description="[Invite link for server owners](https://discord.com/api/oauth2/authorize?client_id=800377812699447306&permissions=8&scope=bot)\n[Invite link for server admins](https://discord.com/api/oauth2/authorize?client_id=800377812699447306&permissions=4294967287&scope=bot%20applications.commands)",
+        description="**[Click here to add TimMcBot to your server.](https://discord.com/api/oauth2/authorize?client_id=800377812699447306&permissions=4294967287&scope=bot%20applications.commands)**",
         color=get_client_color(ctx),
     )
-    invite.set_author(name="Add me to your server!", icon_url=client.user.avatar_url)
+    invite.set_author(name="Invite me to your server!", icon_url=client.user.avatar_url)
     await ctx.send(embed=invite)
 
 
 @slash.slash(name="invite", description="Add TimMcBot to your server!")
 async def _invite(ctx):
     invite = discord.Embed(
-        description="[Invite link for server owners](https://discord.com/api/oauth2/authorize?client_id=800377812699447306&permissions=8&scope=bot)\n[Invite link for server admins](https://discord.com/api/oauth2/authorize?client_id=800377812699447306&permissions=4294967287&scope=bot%20applications.commands)",
+        description="**[Click here to add TimMcBot to your server.](https://discord.com/api/oauth2/authorize?client_id=800377812699447306&permissions=4294967287&scope=bot%20applications.commands)**",
         color=discord.Color.teal(),
     )
     invite.set_author(name="Add me to your server!", icon_url=client.user.avatar_url)
@@ -610,7 +610,7 @@ async def _invite(ctx):
 
 # errors:
 
-""""""
+''''''
 
 
 @client.event

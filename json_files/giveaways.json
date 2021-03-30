@@ -948,12 +948,9 @@
         "endtime": "03/30/2021, 09:58:14",
         "winners": 0,
         "channel": 825081555453607937,
-        "role": null,
-        "messages": 0,
-        "level": null,
         "guild": null,
         "author": 718811967342772285,
-        "ended": false,
+        "ended": true,
         "url": "https://discord.com/channels/806272849458495489/825081555453607937/825670557995368449"
     },
     "825682670746730527": {
@@ -961,13 +958,10 @@
         "endtime": "03/30/2021, 10:47:44",
         "winners": 0,
         "channel": 825089427781058643,
-        "role": null,
-        "messages": null,
         "invites": 1,
         "guild": null,
-        "level": null,
         "author": 807320710807552030,
-        "ended": false,
+        "ended": true,
         "url": "https://discord.com/channels/806272849458495489/825089427781058643/825682670746730527"
     },
     "825686215989919745": {
@@ -975,13 +969,10 @@
         "endtime": "03/30/2021, 10:59:09",
         "winners": 1,
         "channel": 778998242171944992,
-        "role": 792862620956229683,
-        "messages": 100,
         "invites": 2,
         "guild": 819199926256271380,
-        "level": 1,
         "author": 718811967342772285,
-        "ended": false,
+        "ended": true,
         "url": "https://discord.com/channels/740155791834873877/778998242171944992/825686215989919745"
     },
     "825711654913310720": {

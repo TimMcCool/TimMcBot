@@ -692,7 +692,8 @@ class giveaways(commands.Cog):
 
     @commands.command(
         help="If you have permission to use slash commands, you can also use type `/giveaway`!",
-        brief="You can create a neat giveaway with this command",
+        brief="Creates a giveaway",
+        description="Starts the process to create a giveaway.",
         aliases=["giveaway", "gstart"],
     )
     @commands.cooldown(1, 10, commands.BucketType.user)
@@ -708,7 +709,7 @@ class giveaways(commands.Cog):
         await create_giveaway(self, ctx)
 
     @commands.command(
-        brief="Allows you to end one of your giveaways early",
+        brief="Ends a giveaways early",
         description="Allows you to end one of your giveaways early. The giveaway must be hosted by you.",
     )
     async def end(self, ctx, giveaway_message_id):
@@ -739,7 +740,7 @@ class giveaways(commands.Cog):
             )
 
     @commands.command(
-        brief="Allows you to cancel one of your giveaways",
+        brief="Cancels a giveaway",
         description="Allows you to cancel one of your giveaways. The giveaway must be hosted by you.",
     )
     async def cancel(self, ctx, giveaway_message_id):
@@ -784,7 +785,7 @@ class giveaways(commands.Cog):
             )
 
     @commands.command(
-        brief="Picks new winners for one of your ended giveaways",
+        brief="Rerolls a giveaway",
         description="Allows you to let the bot pick new winners for one of your ended giveaways. The giveaway must be hosted by you.\nIf you don't provide a message id, your latest giveaway in the channel will be rerolled.",
     )
     @commands.cooldown(1, 10, commands.BucketType.user)

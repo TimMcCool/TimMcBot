@@ -336,8 +336,9 @@ class minigames(commands.Cog):
                 )
 
     @commands.command(
+        brief="Starts a local TicTacToe game",
         help="If you don't mention an opponent, an open game anyone can join will be started.",
-        description="Play tictactoe against a server member!",
+        description="Play tictactoe against a server member! \nThis command starts a local tictactoe game.",
         aliases=["tic-tac-toe"],
     )
     @commands.cooldown(2, 10, commands.BucketType.user)
@@ -396,8 +397,9 @@ class minigames(commands.Cog):
                 await ingame(self, channel, players, board, turn, spiel, message)
 
     @commands.command(
+        brief="Starts a local connect4 game",
         help="If you don't mention an opponent, an open game anyone can join will be started.",
-        description="Play connect4 against a server member!",
+        description="Play connect4 against a server member!\nThis command starts a local connect4 game.",
         aliases=["connect-4", "viergewinnt", "4gewinnt"],
     )
     @commands.cooldown(2, 10, commands.BucketType.user)
@@ -542,6 +544,7 @@ class minigames(commands.Cog):
                 await ingame(self, channel, players, board, turn, spiel, message)
 
     @commands.command(
+        brief="Starts a global connect4 game (across servers)",
         name="global-connect4",
         description="Starts a global Connect4 game.\nIf someone else runs the command, you'll be matched with them.",
         aliases=[
@@ -643,6 +646,7 @@ class minigames(commands.Cog):
 
     @commands.command(
         name="global-tictactoe",
+        brief="Starts a global TicTacToe game (across servers)",
         description="Starts a global TicTacToe game.\nIf someone else runs the command, you'll be matched with them.",
         aliases=["gtictactoe", "globaltictactoe"],
     )

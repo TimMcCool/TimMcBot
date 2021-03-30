@@ -180,7 +180,7 @@ class leveling(commands.Cog):
             dict(
                 name="user",
                 description="Do you want to see the rank card of a specific user?",
-                type=5,
+                type=6,
                 required="false",
             )
         ],
@@ -309,7 +309,7 @@ class leveling(commands.Cog):
             await ctx.send(
                 embed=discord.Embed(
                     title="Error",
-                    description="This role can't be used because it is managed by a bot or by an intergration.",
+                    description="This role can't be used as rank role because it is **managed** by a bot or by an intergration.",
                     color=discord.Color.red(),
                 )
             )
@@ -319,6 +319,9 @@ class leveling(commands.Cog):
                 levelroles = json.load(d)
             if not str(ctx.guild.id) in levelroles:
                 levelroles[str(ctx.guild.id)] = {}
+            if not str(rank) in levelroles[str(ctx.guild.id)] and len(list(levelroles[str(ctx.guild.id)].keys())) >= 15:
+                await ctx.send("This server **reached the limit** of rank roles! (15) 🚫")
+                return
             levelroles[str(ctx.guild.id)][str(rank)] = role.id
             with open("json_files/levelroles.json", "w") as d:
                 json.dump(levelroles, d, indent=4)
