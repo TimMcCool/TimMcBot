@@ -233,7 +233,7 @@ class leveling(commands.Cog):
                 f"Here is **{ctx.guild.name}**'s web leaderboard:\nhttps://timmcbot.tim135790.repl.co/leaderboard/?guild={ctx.guild.id}"
             )
         else:
-            await levellist(self, ctx, mode=mode)
+            await levellist(self, ctx, mode=mode, slash=True)
 
     @commands.group(
         brief="Shows the server's leaderboard",
@@ -387,7 +387,7 @@ class leveling(commands.Cog):
                     json.dump(levelroles, d, indent=4)
 
 
-async def levellist(self, ctx, *, mode):
+async def levellist(self, ctx, *, mode, slash=False):
     with open("json_files/leveling.json", "r") as d:
         servers = json.load(d)
     if not str(ctx.guild.id) in servers:
@@ -470,8 +470,9 @@ async def levellist(self, ctx, *, mode):
                 f"**Tip:** Enter `{prefix[1]}levels daily` to see the daily leaderboard. :bulb:",
                 embed=board,
             )
-        else:
-            message = await ctx.send(embed=board)
+        elif slash is True:
+            await ctx.send("Here is the leaderboard!", hidden=True)
+        message = await ctx.channel.send(embed=board)
         await message.add_reaction("⏮"), await message.add_reaction(
             "◀"
         ), await message.add_reaction("▶"), await message.add_reaction("⏭")
@@ -481,7 +482,7 @@ async def levellist(self, ctx, *, mode):
                 return (
                     reaction.message == message
                     and str(reaction.emoji) in ["⏮", "◀", "▶", "⏭"]
-                    and user == ctx.author
+                    and user.id == ctx.author.id
                 )
 
             try:

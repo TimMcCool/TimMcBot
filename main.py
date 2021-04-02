@@ -1,4 +1,5 @@
 # imports and installs
+
 import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import MissingPermissions, CheckFailure
@@ -30,7 +31,9 @@ except ModuleNotFoundError:
 from discord_slash import SlashCommand, SlashContext
 from discord_slash.utils.manage_commands import create_option, create_choice
 
+
 # functions
+
 def is_not_private(ctx):
     return not ctx.guild_id is None
 
@@ -61,7 +64,8 @@ def get_prefix(client, message):
             return ["<@!800377812699447306> ", "+"]
 
 
-# init
+# init bot
+
 client = commands.Bot(
     command_prefix=get_prefix,
     intents=discord.Intents.all(),
@@ -74,6 +78,7 @@ client.remove_command("help")
 
 with open("json_files/bans.json", "r") as b:
     bans = json.load(b)
+
 emojis = dict(
     spacer="<:spacer:815004931878158376>",
     blobchain="<a:blobchain_1:808675562159341568>",
@@ -100,11 +105,15 @@ categories = dict(
     polls="🗳 Polls",
 )
 
+
 # load all extensions
+
 for filename in os.listdir("./extensions"):
     if filename.endswith(".py"):
         client.load_extension(f"extensions.{filename[:-3]}")
-# help:
+
+# help command
+
 @slash.slash(
     name="help",
     description="Don't know what to do? This shows you the help message.",
@@ -212,7 +221,6 @@ async def help_cog(ctx, cog_name, prefix):
         if this_cog_name == cog_name and not command.hidden:
             for item in list(command.clean_params):
                 params = f"{params} <{item}>"
-            # embed.description += prefix+command.qualified_name+params+"\n"
             commandinfo = ""
             if not command.brief is None:
                 commandinfo += command.brief + "\n"
@@ -315,8 +323,7 @@ async def help_command(ctx, command, prefix):
         return embed
 
 
-# setup-process
-
+# setup-process and prefixes (unfinished)
 
 @client.command(hidden=True, aliases=["reloadcogs"])
 @commands.is_owner()
@@ -420,7 +427,25 @@ async def remove(ctx, *, prefix):
             await ctx.send("That's not a TimMcBot prefix!")
 
 
-# slash-commands:
+# commands
+
+@client.command(brief="Shows bot latency")
+async def ping(ctx):
+    await ctx.send(
+        f"{ctx.message.author.mention} It took me **{round(client.latency * 1000)}ms** to answer! :clock: That's pretty fast, isn't it?"
+    )
+
+
+@client.command(hidden=True, enabled=False, aliases=["poem"])
+async def potionz(ctx):
+    await ctx.send(
+        embed=discord.Embed(
+            title="Potionz",
+            description="Potionz is lacking awesomeness.\nIt brings users helplessness.\nMy goodness, it brought me sadness!\nHow're you going to enhance this evil business?\n\n*This amazing poem was written by the Scratcher @icmy123 and modified by @TimMcCool*",
+            color=discord.Color.green(),
+        )
+    )
+
 @slash.slash(
     guild_ids=[806272849458495489],
     name="invites",
@@ -440,25 +465,6 @@ async def _invites(ctx, user=None):
     embed = await get_invites(ctx, user)
     embed.set_author(name="📎 " + str(user), icon_url=user.avatar_url)
     await ctx.send(embed=embed)
-
-
-# commands:
-@client.command(brief="Shows bot latency")
-async def ping(ctx):
-    await ctx.send(
-        f"{ctx.message.author.mention} It took me **{round(client.latency * 1000)}ms** to answer! :clock: That's pretty fast, isn't it?"
-    )
-
-
-@client.command(hidden=True, enabled=False, aliases=["poem"])
-async def potionz(ctx):
-    await ctx.send(
-        embed=discord.Embed(
-            title="Potionz",
-            description="Potionz is lacking awesomeness.\nIt brings users helplessness.\nMy goodness, it brought me sadness!\nHow're you going to enhance this evil business?\n\n*This amazing poem was written by the Scratcher @icmy123 and modified by @TimMcCool*",
-            color=discord.Color.green(),
-        )
-    )
 
 
 @client.command()
@@ -495,7 +501,7 @@ async def get_invites(ctx, user):
     embed.set_footer(text=f"Total invited users: {invited_users}")
     return embed
 
-
+'''
 @client.command(
     brief="Sends user a DM",
     description="Sends a user a Direct Message (DM) 📬",
@@ -583,8 +589,18 @@ async def no_dm(ctx, error):
         await ctx.send(
             "Please mention the **user** you want to sent the DM and the **message** you want to send them. :pencil2:"
         )
+'''
 
 
+@slash.slash(name="invite", description="Add TimMcBot to your server!")
+async def _invite(ctx):
+    invite = discord.Embed(
+        description="**[Click here to add TimMcBot to your server.](https://discord.com/api/oauth2/authorize?client_id=800377812699447306&permissions=4294967287&scope=bot%20applications.commands)**",
+        color=discord.Color.teal(),
+    )
+    invite.set_author(name="Add me to your server!", icon_url=client.user.avatar_url)
+    await ctx.send(embed=invite)
+    
 @client.command(
     brief="Add me to your server!",
     description="Run the command to add me to your server!",
@@ -595,16 +611,6 @@ async def invite(ctx):
         color=get_client_color(ctx),
     )
     invite.set_author(name="Invite me to your server!", icon_url=client.user.avatar_url)
-    await ctx.send(embed=invite)
-
-
-@slash.slash(name="invite", description="Add TimMcBot to your server!")
-async def _invite(ctx):
-    invite = discord.Embed(
-        description="**[Click here to add TimMcBot to your server.](https://discord.com/api/oauth2/authorize?client_id=800377812699447306&permissions=4294967287&scope=bot%20applications.commands)**",
-        color=discord.Color.teal(),
-    )
-    invite.set_author(name="Add me to your server!", icon_url=client.user.avatar_url)
     await ctx.send(embed=invite)
 
 
@@ -706,9 +712,9 @@ async def on_command_error(ctx, error):
 @client.event
 async def on_slash_command_error(ctx, ex):
     if isinstance(ex, discord_slash.error.CheckFailure):
-        await ctx.defer()
-        await ctx.send("This slash command doesn't work in Direct Messages! ⚠")
-
+        await ctx.send("This slash command doesn't work in Direct Messages! ⚠", hidden=True)
+    else:
+        await ctx.send(embed=discord.Embed(title="Error", description="Something went wrong!", color=discord.Color.red()))
 
 # events:
 

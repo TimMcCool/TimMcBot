@@ -166,8 +166,8 @@ class polls(commands.Cog):
         await poll_results(self, ctx, poll_message_id, slash=True)
 
     @commands.command(
+        brief="Starts a normal poll",
         help="If you have permission to use slash commands, you can also use `/poll` to create polls!",
-        description="Creates a normal poll.",
         usage='**Yes/No polls:**\n```{0}poll "Do you like the color blue?"```\n**Multiple answer options (up to 20):**\n```{0}poll "What is your favorite color?" "Blue" "Green" "Yellow"```',
     )
     @commands.cooldown(3, 15, commands.BucketType.user)
@@ -176,8 +176,9 @@ class polls(commands.Cog):
         await poll_create(self, ctx, data, False, False)
 
     @commands.command(
+        brief="Starts an anonymous poll",
         help="If you have permission to use slash commands, you can also use `/poll` to create polls!",
-        description="Creates an anonymous poll that doesn't show the author's name.",
+        description="Starts an anonymous poll that won't show the author's name.",
         usage='**Yes/No polls:**\n```{0}anonymouspoll "Do you like anonymous polls?"```\n**Multiple answer options (up to 20):**\n```{0}anonymouspoll "What is your least favorite color?" "Blue" "Green" "Yellow"```',
     )
     @commands.cooldown(3, 15, commands.BucketType.user)
@@ -186,8 +187,9 @@ class polls(commands.Cog):
         await poll_create(self, ctx, data, True, False)
 
     @commands.command(
+        brief= "Starts a strict poll",
         help="If you have permission to use slash commands, you can also use `/poll` to create polls!",
-        description="Creates a poll, but members won't be able to vote for multiple answer options.",
+        description="Starts a poll, but members won't be able to vote for multiple answer options.",
         usage='**Yes/No polls:**\n```{0}strictpoll "Do you like strict polls?"```\n**Multiple answer options (up to 20):**\n```{0}strictpoll "What color do you like most?" "Blue" "Green" "Yellow"```',
     )
     @commands.cooldown(3, 15, commands.BucketType.user)
@@ -196,7 +198,8 @@ class polls(commands.Cog):
         await poll_create(self, ctx, data, False, True)
 
     @commands.command(
-        description="Shows all running and all stopped polls on the server.",
+        brief="Shows all polls",
+        description="Shows all polls on the server.",
         aliases=["polls", "allpolls", "serverpolls"],
     )
     async def pollslist(self, ctx):
@@ -216,9 +219,9 @@ class polls(commands.Cog):
                 else:
                     stopped += f"[◈ {data[poll]['name']}]({data[poll]['url']})\n"
             if not running == "":
-                embed.description = f"**Running polls:**\n{running}\n"
+                embed.add_field(name="**Running polls:**", value=running, inline=False)
             if not stopped == "":
-                embed.description += f"**Stopped polls:\n**{stopped}"
+                embed.add_field(name="**Stopped polls:**", value=stopped, inline=False)
         else:
             embed.description = "No polls have been created on this server yet!"
         embed.set_thumbnail(url=ctx.guild.icon_url)
@@ -228,6 +231,7 @@ class polls(commands.Cog):
     @commands.command(
         help="You can also stop your polls by reacting with ❎!",
         name="stop-poll",
+        brief="Stops a specific poll",
         description="Allows you to stop one of your polls. New votes on stopped polls will automatically be removed.",
         aliases=["stoppoll", "end-poll", "endpoll"],
     )
@@ -280,6 +284,7 @@ class polls(commands.Cog):
             )
 
     @commands.command(
+        brief="Shows the results of a poll",
         description="Shows the results of a poll.\nIf no message id is provided, it shows the result of the latest poll on the server.",
         aliases=["poll-results", "result", "poll-result"],
     )

@@ -9,7 +9,14 @@ from extensions import leveling
 from datetime import datetime, timedelta
 from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option, create_choice
+from replit import db
 
+#getting data from replit database (this is a TEMPORARY solution)
+gaws = dict(db['giveaways'])
+for key in list(gaws.keys()):
+    gaws[key] = dict(gaws[key])
+with open("json_files/giveaways.json", "w") as g:
+    json.dump(gaws, g, indent=4)
 
 questions = [
     "What's the prize for your giveaway?",
@@ -336,9 +343,9 @@ async def create_giveaway(self, ctx, data=None):
         content = content + f"\n❖ Required invited users: {data['invites']}"
 
     if not data["role"] is None:
-        content = content + f"\n\n**➲ Required role:**\n{role.mention}"
+        content = content + f"\n\n**► Required role:**\n{role.mention}"
     if not data["guild"] is None:
-        content = content + f"\n\n**➲ You have to be in:**\n{guild.name}"
+        content = content + f"\n\n**► You have to be in:**\n{guild.name}"
 
     content = content + "\n\n**React with 🎉 to enter!**"
     embed.description = content
@@ -353,6 +360,8 @@ async def create_giveaway(self, ctx, data=None):
         with open("json_files/giveaways.json", "r") as g:
             gaws = json.load(g)
         gaws[str(gaw.id)] = data
+        
+        db['giveaways'] = gaws
         with open("json_files/giveaways.json", "w") as g:
             json.dump(gaws, g, indent=4)
     except discord.Forbidden:
@@ -382,14 +391,14 @@ class giveaways(commands.Cog):
         self.client = client
         self.manage_gaws.start()
 
-    @tasks.loop(seconds=30)
+    @tasks.loop(seconds=20)
     async def manage_gaws(self):
         with open("json_files/giveaways.json", "r") as g:
-            keys = list(json.load(g).keys())
+            gaws = json.load(g)
+        db['giveaways'] = gaws
+        keys = list(gaws.keys())
         keys.reverse()
         for gaw in keys:
-            with open("json_files/giveaways.json", "r") as g:
-                gaws = json.load(g)
             try:
                 data = gaws[gaw]
                 ends = datetime.strptime(data["endtime"], "%m/%d/%Y, %H:%M:%S")
@@ -408,6 +417,12 @@ class giveaways(commands.Cog):
                     try:
                         channel = await self.client.fetch_channel(data["channel"])
                         msg = await channel.fetch_message(int(gaw))
+                        try:
+                            if str(msg.embeds[0].author.name) == "🎉 Ended Giveaway" and reroll is False:
+                                print("UH OH!!! another giveaway error occurred.")
+                                continue
+                        except Exception:
+                            pass
                         for reaction in msg.reactions:
                             if reaction.emoji == "🎉":
                                 users, potwinners = await reaction.users().flatten(), []
@@ -713,7 +728,7 @@ class giveaways(commands.Cog):
         description="Allows you to end one of your giveaways early. The giveaway must be hosted by you.",
     )
     async def end(self, ctx, giveaway_message_id):
-        prefix = get_prefix(self.client, ctx.message)
+        prefix = get_prefix(self.client, ctx.message)[1]
         with open("json_files/giveaways.json", "r") as g:
             gaws = json.load(g)
         if giveaway_message_id in gaws:
@@ -726,6 +741,8 @@ class giveaways(commands.Cog):
                 else:
                     data["endtime"] = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
                     gaws[giveaway_message_id] = data
+
+                    db['giveaways'] = gaws
                     with open("json_files/giveaways.json", "w") as g:
                         json.dump(gaws, g, indent=4)
                     self.manage_gaws.restart()
@@ -756,6 +773,8 @@ class giveaways(commands.Cog):
                 else:
                     channel = await self.client.fetch_channel(data["channel"])
                     gaws.pop(giveaway_message_id)
+
+                    db['giveaways'] = gaws
                     with open("json_files/giveaways.json", "w") as g:
                         json.dump(gaws, g, indent=4)
                     message = await channel.fetch_message(int(giveaway_message_id))
@@ -963,9 +982,9 @@ async def reroll(self, ctx, giveaway_message_id, *, slash=False):
                 break
     if giveaway_message_id is None:
         if slash is True:
-            await ctx.send("Couldn't find any giveaways to reroll!", hidden=True)
+            await ctx.send("Couldn't find any giveaways to reroll in here!", hidden=True)
         else:
-            await ctx.send("Couldn't find any giveaways to reroll!")
+            await ctx.send("Couldn't find any giveaways to reroll in here!")
         return
     if giveaway_message_id in gaws:
         data = gaws[giveaway_message_id]
@@ -1020,6 +1039,8 @@ async def reroll(self, ctx, giveaway_message_id, *, slash=False):
                         await ctx.send("👌 alright, the giveaway will be rerolled!")
                         data["ended"] = False
                         gaws[giveaway_message_id] = data
+
+                        db['giveaways'] = gaws
                         with open("json_files/giveaways.json", "w") as g:
                             json.dump(gaws, g, indent=4)
                         self.manage_gaws.restart()
