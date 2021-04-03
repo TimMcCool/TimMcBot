@@ -336,7 +336,6 @@ class minigames(commands.Cog):
                 )
 
     @commands.command(
-        brief="Starts a local TicTacToe game",
         help="If you don't mention an opponent, an open game anyone can join will be started.",
         description="Play tictactoe against a server member! \nThis command starts a local tictactoe game.",
         aliases=["tic-tac-toe"],
@@ -397,7 +396,6 @@ class minigames(commands.Cog):
                 await ingame(self, channel, players, board, turn, spiel, message)
 
     @commands.command(
-        brief="Starts a local connect4 game",
         help="If you don't mention an opponent, an open game anyone can join will be started.",
         description="Play connect4 against a server member!\nThis command starts a local connect4 game.",
         aliases=["connect-4", "viergewinnt", "4gewinnt"],

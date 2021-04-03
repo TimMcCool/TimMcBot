@@ -65,7 +65,6 @@ def get_prefix(client, message):
 
 
 # init bot
-
 client = commands.Bot(
     command_prefix=get_prefix,
     intents=discord.Intents.all(),
@@ -210,7 +209,8 @@ async def help_cog(ctx, cog_name, prefix):
     else:
         name = cog_name
 
-    embed = discord.Embed(title=name, description="", color=get_client_color(ctx))
+    embed = discord.Embed(description="", color=get_client_color(ctx))
+    embed.set_author(name=name, icon_url=client.user.avatar_url)
 
     for command in client.commands:
         if command.cog is None:
@@ -223,7 +223,7 @@ async def help_cog(ctx, cog_name, prefix):
                 params = f"{params} <{item}>"
             commandinfo = ""
             if not command.brief is None:
-                commandinfo += command.brief + "\n"
+                commandinfo += "➣ "+ command.brief 
             try:
                 subcommands = None
                 for subcmd in command.commands:
@@ -232,28 +232,19 @@ async def help_cog(ctx, cog_name, prefix):
                     for item in subcmd.clean_params:
                         subcmd_params = f"{subcmd_params} <{item}>"
                     if subcommands == None:
-                        subcommands = "\n" + prefix + subcmd.qualified_name + subcmd_params
+                        subcommands = "`" + prefix + subcmd.qualified_name + subcmd_params + "`"
                     else:
                         subcommands = (
-                            subcommands + "\n" + prefix + subcmd.qualified_name + subcmd_params
+                            subcommands + ", `" + prefix + subcmd.qualified_name + subcmd_params + "`"
                         )
-                commandinfo += "``````𝗦𝘂𝗯𝗰𝗼𝗺𝗺𝗮𝗻𝗱𝘀:" + subcommands
+                commandinfo += "\n➣ Subcommands: " + subcommands
             except Exception:
                 pass
-            if commandinfo == "":
-                embed.add_field(
-                    name=prefix + command.qualified_name + params,
-                    value="** **",
-                    inline=False,
-                )
-            else:
-                embed.add_field(
-                    name=prefix + command.qualified_name + params,
-                    value="```"+commandinfo+"```",
-                    inline=False,
-                )
+            embed.description += f"\n**{prefix + command.qualified_name + params}**\n"
+            if not commandinfo == "":
+                embed.description += commandinfo+"\n"
     embed.description += (
-        f"Enter `{prefix}help <command>` to get info on a certain command"
+        f"\n*Enter `{prefix}help <command>` to get info on a certain command*"
     )
     return embed
 
@@ -428,7 +419,6 @@ async def remove(ctx, *, prefix):
 
 
 # commands
-
 @client.command(brief="Shows bot latency")
 async def ping(ctx):
     await ctx.send(
@@ -714,7 +704,7 @@ async def on_slash_command_error(ctx, ex):
     if isinstance(ex, discord_slash.error.CheckFailure):
         await ctx.send("This slash command doesn't work in Direct Messages! ⚠", hidden=True)
     else:
-        await ctx.send(embed=discord.Embed(title="Error", description="Something went wrong!", color=discord.Color.red()))
+        await ctx.send("Something went wrong! :frowning:")
 
 # events:
 

@@ -7,6 +7,9 @@ import asyncio
 from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option, create_choice
 from dhooks import Webhook
+from PIL import Image, ImageFilter, ImageEnhance
+import requests
+import os
 
 rickroll_wins = [
     "LOTS OF MONEY",
@@ -24,6 +27,39 @@ class fun(commands.Cog):
         self.client = client
 
     # commands
+
+    @commands.command()
+    async def blur(self, ctx, user: discord.User=None, intensity: int=4):
+        if user is None:
+            user = ctx.author
+
+        img = requests.get(str(user.avatar_url_as(size=128)), allow_redirects=True)
+        open(f'temp_files/{user.id}avatar.png', 'wb').write(img.content)
+
+        filtered_img = Image.open(f'temp_files/{user.id}avatar.png').filter(ImageFilter.GaussianBlur(intensity))
+        filtered_img.save(f'temp_files/blur{user.id}avatar.png')
+
+        await ctx.send(file=discord.File(f'temp_files/blur{user.id}avatar.png'))
+
+        os.remove(f'temp_files/{user.id}avatar.png')
+        os.remove(f'temp_files/blur{user.id}avatar.png')
+
+    @commands.command()
+    async def test(self, ctx, user: discord.User=None):
+        if user is None:
+            user = ctx.author
+
+        img = requests.get(str(user.avatar_url_as(size=128)), allow_redirects=True)
+        open(f'temp_files/{user.id}avatar.png', 'wb').write(img.content)
+
+        filtered_img = Image.open(f'temp_files/{user.id}avatar.png').filter(ImageEnhance.Contrast(5))
+
+        filtered_img.save(f'temp_files/blur{user.id}avatar.png')
+
+        await ctx.send(file=discord.File(f'temp_files/blur{user.id}avatar.png'))
+
+        os.remove(f'temp_files/{user.id}avatar.png')
+        os.remove(f'temp_files/blur{user.id}avatar.png')
 
     @commands.command()
     async def blobchain(self, ctx):
@@ -174,7 +210,7 @@ class fun(commands.Cog):
         await ctx.send(
             f"{target.mention} {ctx.author.name} has gifted you **{random.choice(rickroll_wins)}!** :tada:",
             embed=discord.Embed(
-                description="[Click here to claim it!](http://alturl.com/7y5we) :boom:",
+                description="**[Click here to claim it!](http://alturl.com/7y5we)** :boom:",
                 color=discord.Colour.blue(),
             ),
         )

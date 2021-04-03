@@ -1,38 +1,118 @@
 {
-    "827680360028307466": {
-        "name": "2treferfe",
-        "endtime": "04/02/2021, 23:06:17",
+    "825862723362357249": {
+        "name": "test",
+        "endtime": "03/30/2021, 22:43:36",
+        "winners": 1,
+        "channel": 818455648903626752,
+        "invites": 2,
+        "guild": 806272849458495489,
+        "author": 718811967342772285,
+        "ended": true,
+        "url": "https://discord.com/channels/806272849458495489/818455648903626752/825862723362357249"
+    },
+    "826086894587609129": {
+        "name": "230k DANK DOLLARS",
+        "endtime": "03/31/2021, 13:34:04",
+        "winners": 1,
+        "channel": 796165738201219102,
+        "invites": null,
+        "guild": null,
+        "author": 731965572207870023,
+        "ended": true,
+        "url": "https://discord.com/channels/740155791834873877/796165738201219102/826086894587609129"
+    },
+    "826160933532991520": {
+        "name": "test",
+        "endtime": "03/29/2021, 18:28:52",
         "winners": 0,
+        "channel": 825089427781058643,
+        "invites": null,
+        "guild": null,
+        "author": 807320710807552030,
+        "ended": true,
+        "url": "https://discord.com/channels/806272849458495489/825089427781058643/826160933532991520"
+    },
+    "827617282414739476": {
+        "name": "test",
+        "endtime": "04/02/2021, 18:56:08",
+        "winners": 0,
+        "channel": 818455648903626752,
+        "invites": null,
+        "guild": null,
+        "author": 718811967342772285,
+        "ended": true,
+        "url": "https://discord.com/channels/806272849458495489/818455648903626752/827617282414739476"
+    },
+    "827664396238454815": {
+        "name": "Dank Heist",
+        "endtime": "04/03/2021, 12:02:25",
+        "winners": 1,
+        "channel": 782697346420047902,
+        "invites": null,
+        "guild": null,
+        "author": 731965572207870023,
+        "ended": true,
+        "url": "https://discord.com/channels/740155791834873877/782697346420047902/827664396238454815"
+    },
+    "827673657538379836": {
+        "name": "343r",
+        "endtime": "04/02/2021, 22:39:47",
+        "winners": 1,
         "channel": 817155267816587326,
         "invites": null,
         "guild": null,
         "author": 718811967342772285,
         "ended": true,
-        "url": "https://discord.com/channels/806272849458495489/817155267816587326/827680360028307466"
+        "url": "https://discord.com/channels/806272849458495489/817155267816587326/827673657538379836"
     },
-    "827683826703532053": {
-        "name": "test",
-        "endtime": "04/02/2021, 23:20:36",
-        "winners": 0,
-        "channel": 817155267816587326,
-        "invites": 0,
-        "guild": null,
-        "author": 718811967342772285,
-        "ended": true,
-        "url": "https://discord.com/channels/806272849458495489/817155267816587326/827683826703532053"
-    },
-    "827687373822754876": {
-        "name": "test",
-        "endtime": "04/04/2021, 23:34:07",
-        "winners": 0,
-        "channel": 825089427781058643,
+    "827865817809944627": {
+        "name": "50 banknotes",
+        "endtime": "04/06/2021, 11:21:22",
+        "winners": 1,
+        "channel": 796165738201219102,
         "role": null,
         "messages": null,
         "invites": null,
         "guild": null,
-        "level": null,
-        "author": 718811967342772285,
+        "level": 1,
+        "author": 780525368620089377,
         "ended": false,
-        "url": "https://discord.com/channels/806272849458495489/825089427781058643/827687373822754876"
+        "url": "https://discord.com/channels/740155791834873877/796165738201219102/827865817809944627"
+    },
+    "827878264336547850": {
+        "name": "test",
+        "endtime": "04/03/2021, 12:12:50",
+        "winners": 1,
+        "channel": 818455648903626752,
+        "invites": 1,
+        "guild": 806272849458495489,
+        "author": 718811967342772285,
+        "ended": true,
+        "url": "https://discord.com/channels/806272849458495489/818455648903626752/827878264336547850"
+    },
+    "827941216904544266": {
+        "name": "erferfefe",
+        "endtime": "04/03/2021, 16:22:39",
+        "winners": 0,
+        "channel": 818455648903626752,
+        "invites": null,
+        "guild": null,
+        "author": 718811967342772285,
+        "ended": true,
+        "url": "https://discord.com/channels/806272849458495489/818455648903626752/827941216904544266"
+    },
+    "827946128224944208": {
+        "name": "Level 100 45% Giratina",
+        "endtime": "04/06/2021, 16:41:59",
+        "winners": 1,
+        "channel": 800019271844888615,
+        "role": null,
+        "messages": null,
+        "invites": 1,
+        "guild": null,
+        "level": null,
+        "author": 731965572207870023,
+        "ended": false,
+        "url": "https://discord.com/channels/800008691289292821/800019271844888615/827946128224944208"
     }
 }

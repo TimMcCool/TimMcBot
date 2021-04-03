@@ -88,10 +88,10 @@ class leveling(commands.Cog):
             new_xp = randint(14, 20)
             data["xp"] = data["xp"] + new_xp
             new_level = getlevel(data["xp"])[0]
-            if old_level != new_level:
-                await message.channel.send(
-                    f"GG {message.author.mention}, you just advanced to **Level {new_level}**! Keep it up! :partying_face:"
-                )
+            #if old_level != new_level:
+            #    await message.channel.send(
+            #        f"GG {message.author.mention}, you just advanced to **Level {new_level}**! Keep it up! :partying_face:"
+            #    )
             data["last"] = round(time.time())
             if (
                 data["daily"]["day"]

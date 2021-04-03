@@ -25,7 +25,7 @@ class globalchat(commands.Cog):
     async def on_message(self, message):
         with open("json_files/globalchat.json", "r") as g:
             gchannels = json.load(g)   
-        if False:#str(message.channel.id) in gchannels and not message.author.bot is True:
+        if str(message.channel.id) in gchannels and not message.author.bot is True:
             try:
                 embed = discord.Embed(
                     title="New Message",

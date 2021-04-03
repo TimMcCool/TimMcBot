@@ -127,7 +127,7 @@ async def create_giveaway(self, ctx, data=None):
                 return
             else:
                 last_ans, error = "", False
-                if msg.content.lower() == "skip" or msg.content.lower() == "none":
+                if msg.content.lower() == "skip" or msg.content.lower() == "none" or msg.content.lower() == "no":
                     if q > 3:
                         data[keys[q]] = None
                     else:
@@ -418,7 +418,7 @@ class giveaways(commands.Cog):
                         channel = await self.client.fetch_channel(data["channel"])
                         msg = await channel.fetch_message(int(gaw))
                         try:
-                            if str(msg.embeds[0].author.name) == "🎉 Ended Giveaway" and reroll is False:
+                            if str(msg.embeds[0].author.name) == "🎊 Ended Giveaway" and reroll is False:
                                 print("UH OH!!! another giveaway error occurred.")
                                 continue
                         except Exception:
@@ -468,7 +468,7 @@ class giveaways(commands.Cog):
                             color=discord.Colour.random(),
                             timestamp=ends,
                         )
-                        embed.set_author(name="🎉 Ended Giveaway")
+                        embed.set_author(name="🎊 Ended Giveaway")
                         embed.set_footer(text="Ended at")
                         try:
                             await msg.edit(content=None, embed=embed)
@@ -651,7 +651,7 @@ class giveaways(commands.Cog):
         data["guild"] = None
 
         if not required_server is None and not (
-            required_server.lower() == "skip" or required_server.lower() == "none"
+            required_server.lower() == "skip" or required_server.lower() == "none" or required_server.lower() == "no"
         ):
             try:
                 try:

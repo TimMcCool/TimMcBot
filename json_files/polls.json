@@ -200,5 +200,19 @@
                 "Downvotes"
             ]
         }
+    },
+    "800008691289292821": {
+        "827951384590548993": {
+            "name": "Do you like polls?",
+            "strict": true,
+            "url": "https://discord.com/channels/800008691289292821/818552129454211122/827951384590548993",
+            "author": 718811967342772285,
+            "ended": false,
+            "channel": 818552129454211122,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        }
     }
 }
