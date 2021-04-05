@@ -29,37 +29,39 @@ class fun(commands.Cog):
     # commands
 
     @commands.command()
-    async def blur(self, ctx, user: discord.User=None, intensity: int=4):
+    async def blur(self, ctx, *, user: discord.User=None):
         if user is None:
             user = ctx.author
 
         img = requests.get(str(user.avatar_url_as(size=128)), allow_redirects=True)
-        open(f'temp_files/{user.id}avatar.png', 'wb').write(img.content)
+        open(f'temp_files/blur{user.id}.png', 'wb').write(img.content)
 
-        filtered_img = Image.open(f'temp_files/{user.id}avatar.png').filter(ImageFilter.GaussianBlur(intensity))
-        filtered_img.save(f'temp_files/blur{user.id}avatar.png')
+        filtered_img = Image.open(f'temp_files/blur{user.id}.png').filter(ImageFilter.GaussianBlur(4))
+        filtered_img.save(f'temp_files/blur{user.id}.png')
 
-        await ctx.send(file=discord.File(f'temp_files/blur{user.id}avatar.png'))
+        await ctx.send(file=discord.File(f'temp_files/blur{user.id}.png'))
 
-        os.remove(f'temp_files/{user.id}avatar.png')
-        os.remove(f'temp_files/blur{user.id}avatar.png')
+        os.remove(f'temp_files/blur{user.id}.png')
 
-    @commands.command()
-    async def test(self, ctx, user: discord.User=None):
+    @commands.command(aliases=["colourful"])
+    async def colorful(self, ctx, *, user: discord.User=None):
         if user is None:
             user = ctx.author
 
         img = requests.get(str(user.avatar_url_as(size=128)), allow_redirects=True)
-        open(f'temp_files/{user.id}avatar.png', 'wb').write(img.content)
+        open(f'temp_files/color{user.id}.png', 'wb').write(img.content)
 
-        filtered_img = Image.open(f'temp_files/{user.id}avatar.png').filter(ImageEnhance.Contrast(5))
+        filtered_img = ImageEnhance.Color(Image.open(f'temp_files/color{user.id}.png'))
 
-        filtered_img.save(f'temp_files/blur{user.id}avatar.png')
+        filtered_img.enhance(20.0).save(f'temp_files/color{user.id}.png')
 
-        await ctx.send(file=discord.File(f'temp_files/blur{user.id}avatar.png'))
+        await ctx.send(file=discord.File(f'temp_files/color{user.id}.png'))
 
-        os.remove(f'temp_files/{user.id}avatar.png')
-        os.remove(f'temp_files/blur{user.id}avatar.png')
+        os.remove(f'temp_files/color{user.id}.png')
+
+    @commands.command(aliases=["blend"])
+    async def merge(self, ctx, user1 : discord.User, user2: discord.User):
+        await merge(self, ctx, user1, user2)
 
     @commands.command()
     async def blobchain(self, ctx):
@@ -381,6 +383,25 @@ async def emojify(ctx, text):
                 output += i + " "
     return output
 
+async def merge(self, ctx, user1, user2):
+    image1 = requests.get(str(user1.avatar_url_as(size=128)), allow_redirects=True)
+    open(f'temp_files/merge{user1.id}.png', 'wb').write(image1.content)
+    image1 = Image.open(f'temp_files/merge{user1.id}.png').convert('RGB')
+
+    os.remove(f'temp_files/merge{user1.id}.png')
+
+    image2 = (requests.get(str(user2.avatar_url_as(size=128)), allow_redirects=True))
+    open(f'temp_files/merge{user2.id}.png', 'wb').write(image2.content)
+    image2 = Image.open(f'temp_files/merge{user2.id}.png').convert('RGB')
+
+    os.remove(f'temp_files/merge{user2.id}.png')
+
+    blended = Image.blend(image1, image2, alpha=0.5)
+    blended.save(f'temp_files/merge{user1.id}&{user2.id}.png')
+
+    await ctx.send(file=discord.File(f'temp_files/merge{user1.id}&{user2.id}.png'))
+
+    os.remove(f'temp_files/merge{user1.id}&{user2.id}.png')
 
 # activate cogs
 

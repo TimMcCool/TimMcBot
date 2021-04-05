@@ -185,6 +185,7 @@ class leveling(commands.Cog):
             )
         ],
     )
+    @commands.check(is_not_private)
     async def _rank(self, ctx, user=None):
         if user is None:
             await rankcard(ctx, ctx.author, True)
@@ -226,6 +227,7 @@ class leveling(commands.Cog):
             )
         ],
     )
+    @commands.check(is_not_private)
     async def _levels(self, ctx, type):
         mode = int(type)
         if mode == 3:
@@ -461,18 +463,19 @@ async def levellist(self, ctx, *, mode, slash=False):
             self, ctx, tcropped, f"📖 Page {seite} of {seiten}", 0, symbol, mode
         )
         if random.randint(0, 5) == 0 and mode == 0:
-            message = await ctx.send(
+            message = await ctx.channel.send(
                 f"**Tip:** Enter `{prefix[1]}levels weekly` to see the weekly leaderboard. :bulb:",
                 embed=board,
             )
         elif random.randint(0, 5) == 1 and mode == 0:
-            message = await ctx.send(
+            message = await ctx.channel.send(
                 f"**Tip:** Enter `{prefix[1]}levels daily` to see the daily leaderboard. :bulb:",
                 embed=board,
             )
-        elif slash is True:
+        else:
+            message = await ctx.channel.send(embed=board)
+        if slash is True:
             await ctx.send("Here is the leaderboard!", hidden=True)
-        message = await ctx.channel.send(embed=board)
         await message.add_reaction("⏮"), await message.add_reaction(
             "◀"
         ), await message.add_reaction("▶"), await message.add_reaction("⏭")

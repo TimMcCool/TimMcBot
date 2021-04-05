@@ -34,11 +34,11 @@ descriptions = [
     None,
     "Enter the duration like that:\n```glsl\n3 weeks = 3w\n1 day and 20 hours = 1d, 20h\n30 minutes and 10 seconds = 30m, 10s```",
     "Enter a number between 0 and 99.",
-    "Mention it or reply with its id.",
-    "Mention it or reply with its id.",
+    "Name it, mention it or reply with its id.",
+    "Name it, mention it or reply with its id.",
     None,
     None,
-    "Reply with its id or with an invite link to the server.",
+    "Name it, reply with its id or send an invite link to the server.",
     None,
 ]
 
@@ -105,6 +105,11 @@ async def create_giveaway(self, ctx, data=None):
                     )
                     if q > 3:
                         embed.set_footer(text=footer)
+                    if q == 5:
+                        embed.add_field(
+                            name="Note:",
+                            value="Only messages that have been sent since TimMcBot was added count.",
+                        )
                     if q == 7:
                         embed.add_field(
                             name="Note:",
@@ -239,15 +244,19 @@ async def create_giveaway(self, ctx, data=None):
                             channel = await self.client.fetch_channel(last_ans)
                             channel.id
                         except Exception:
-                            await ctx.send(
-                                embed=discord.Embed(
-                                    title="Couldn't fetch that channel",
-                                    description="Please try again!\nMake sure to enter a **valid channel** that the bot **can access.**",
-                                    color=discord.Colour.red(),
+                            channel = discord.utils.get(ctx.guild.channels, name=msg.content)
+                            if channel is None:
+                                await ctx.send(
+                                    embed=discord.Embed(
+                                        title="Couldn't fetch that channel",
+                                        description="Please try again!\nMake sure to enter a **valid channel** that the bot **can access.**",
+                                        color=discord.Colour.red(),
+                                    )
                                 )
-                            )
-                            error = True
-                            continue
+                                error = True
+                                continue
+                            else:
+                                last_ans = channel.id
                     elif q == 4:
                         for char in msg.content:
                             if char.isdigit():
@@ -257,15 +266,19 @@ async def create_giveaway(self, ctx, data=None):
                             role = ctx.guild.get_role(last_ans)
                             role.id
                         except Exception:
-                            await ctx.send(
-                                embed=discord.Embed(
-                                    title="Couldn't get that role",
-                                    description="Please try again!\nMake sure to **mention** a valid role **or send its id.**",
-                                    color=discord.Colour.red(),
+                            role = discord.utils.get(ctx.guild.roles, name=msg.content)
+                            if role is None:
+                                await ctx.send(
+                                    embed=discord.Embed(
+                                        title="Couldn't get that role",
+                                        description="Please try again!\nMake sure to **mention** a valid role **or send its id.**",
+                                        color=discord.Colour.red(),
+                                    )
                                 )
-                            )
-                            error = True
-                            continue
+                                error = True
+                                continue
+                            else:
+                                last_ans = role.id
                     elif q == 5 or q == 6 or q == 8:
                         try:
                             last_ans = int(msg.content)
@@ -279,37 +292,42 @@ async def create_giveaway(self, ctx, data=None):
                             error = True
                             continue
                     elif q == 7:
-                        try:
+                        guild = discord.utils.get(self.client.guilds, name=msg.content)
+                        if guild is None:
                             try:
-                                guild_id = int(msg.content)
+                                try:
+                                    guild_id = int(msg.content)
+                                except Exception:
+                                    invite = await self.client.fetch_invite(msg.content)
+                                    guild = invite.guild
+                                    if isinstance(guild, discord.PartialInviteGuild):
+                                        embed = discord.Embed(
+                                            description="You can only choose servers TimMcBot is in!\n\nPlease [add TimMcBot to the server](https://discord.com/api/oauth2/authorize?client_id=800377812699447306&permissions=4294967287&scope=bot%20applications.commands) or choose another one.",
+                                            color=discord.Colour.red(),
+                                        )
+                                        embed.set_author(
+                                            name=f"TimMcBot isn't in '{guild.name}'",
+                                            icon_url=str(guild.icon_url),
+                                        )
+                                        await ctx.send(embed=embed)
+                                        error = True
+                                        continue
+                                    last_ans = guild.id
+                                else:
+                                    guild = await self.client.fetch_guild(guild_id)
+                                    last_ans = guild.id
                             except Exception:
-                                invite = await self.client.fetch_invite(msg.content)
-                                guild = invite.guild
-                                if isinstance(guild, discord.PartialInviteGuild):
-                                    embed = discord.Embed(
-                                        description="You can only choose servers TimMcBot is in!\n\nPlease [add TimMcBot to the server](https://discord.com/api/oauth2/authorize?client_id=800377812699447306&permissions=4294967287&scope=bot%20applications.commands) or choose another one.",
+                                
+                                await ctx.send(
+                                    embed=discord.Embed(
+                                        description="**Couldn't fetch that server.** Please try again!",
                                         color=discord.Colour.red(),
                                     )
-                                    embed.set_author(
-                                        name=f"TimMcBot isn't in '{guild.name}'",
-                                        icon_url=str(guild.icon_url),
-                                    )
-                                    await ctx.send(embed=embed)
-                                    error = True
-                                    continue
-                                last_ans = guild.id
-                            else:
-                                guild = await self.client.fetch_guild(guild_id)
-                                last_ans = guild.id
-                        except Exception:
-                            await ctx.send(
-                                embed=discord.Embed(
-                                    description="**Couldn't fetch that server.** Please try again!",
-                                    color=discord.Colour.red(),
                                 )
-                            )
-                            error = True
-                            continue
+                                error = True
+                                continue
+                        else:
+                            last_ans = guild.id
                     else:
                         last_ans = msg.content
                     data[keys[q]] = last_ans
@@ -541,7 +559,7 @@ class giveaways(commands.Cog):
             ),
             dict(
                 name="server",
-                description="Is there a server users need to be in? Send its id or an invite link to it!",
+                description="Is there a server users need to be in? Send its name, its id or an invite link to it!",
                 type=3,
                 required="false",
             ),
@@ -675,13 +693,18 @@ class giveaways(commands.Cog):
                     guild = await self.client.fetch_guild(guild_id)
                     data["guild"] = guild
             except Exception:
-                await ctx.send(
-                    embed=discord.Embed(
-                        description="**Couldn't fetch the server you set as requirement.** Please try again!",
-                        color=discord.Colour.red(),
+                guild = discord.utils.get(self.client.guilds, name=required_server)
+                if guild is None:
+                    await ctx.send(
+                        embed=discord.Embed(
+                            description="**Couldn't fetch the server you set as requirement.** Please try again!",
+                            color=discord.Colour.red(),
+                        )
                     )
-                )
-                return
+                    return
+                else:
+                    data["guild"] = guild
+
         data["level"] = required_level
 
         data["author"] = ctx.author.id
@@ -922,14 +945,9 @@ class giveaways(commands.Cog):
                             required_guild = await self.client.fetch_guild(
                                 data["guild"]
                             )
-                            in_guild = False
-                            for (
-                                guild_member
-                            ) in await required_guild.fetch_members().flatten():
-                                if guild_member.id == member.id:
-                                    in_guild = True
-                                    break
-                            if in_guild is False:
+                            try:
+                                await required_guild.fetch_member(member.id)
+                            except Exception:
                                 try:
                                     await join_failure(
                                         member,

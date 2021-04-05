@@ -17,7 +17,7 @@ from math import ceil
 import inspect
 import os
 import subprocess
-
+from replit import db
 
 def install(name):
     subprocess.call(["pip", "install", name])
@@ -143,7 +143,7 @@ for filename in os.listdir("./extensions"):
 async def _help(ctx, category=None, command=None):
     prefixes = get_prefix(client, ctx.guild_id)
     prefix = prefixes[1]
-
+    embed = None
     cogs = list(client.cogs)
 
     if not category is None:
@@ -151,6 +151,9 @@ async def _help(ctx, category=None, command=None):
             embed = await help_cog(ctx, category, prefix)
         elif category == "other":
             embed = await help_cog(ctx, None, prefix)
+    if not embed is None:
+        await ctx.send(embed=embed)
+        embed = None
     if not command is None:
         embed = await help_command(ctx, command, prefix)
     if category is None and command is None:
@@ -419,6 +422,59 @@ async def remove(ctx, *, prefix):
 
 
 # commands
+@client.command(brief="Gives you the id of a user")
+async def id(ctx, *, user: discord.User=None):
+    if user is None:
+        await ctx.send(
+            f"Your user id is `{ctx.author.id}`."
+        )
+    else:
+        await ctx.send(f"The user id of **{user}** is `{user.id}`.")
+
+@slash.slash(
+    guild_ids=[806272849458495489],
+
+    name="id",
+    description="Gives you the id of something",
+    options=[
+        dict(
+            name="member",
+            description="Gives you the user id",
+            type=6,
+            required="false",
+        ),
+        dict(
+            name="role",
+            description="Gives you the role id",
+            type=8,
+            required="false",
+        ),
+        dict(
+            name="channel_or_category",
+            description="Gives you the channel or category id",
+            type=7,
+            required="false",
+        )
+    ]) 
+async def id(ctx, member: discord.Member= None, role: discord.Role= None, channel_or_category=None):
+    channel = channel_or_category
+    if not member is None:
+        await ctx.send(
+            f"The user id of **{member}** is `{member.id}`."
+        )
+    if not role is None:
+        await ctx.send(
+            f"The role id of **{role}** is `{role.id}`."
+        )
+    if not channel is None:
+        await ctx.send(
+            f"The id of **{channel.mention}** is `{channel.id}`."
+        )
+    if role is None and member is None and channel is None:
+        await ctx.send(
+            f"Your user id is `{ctx.author.id}`."
+        )
+
 @client.command(brief="Shows bot latency")
 async def ping(ctx):
     await ctx.send(
@@ -491,101 +547,11 @@ async def get_invites(ctx, user):
     embed.set_footer(text=f"Total invited users: {invited_users}")
     return embed
 
-'''
-@client.command(
-    brief="Sends user a DM",
-    description="Sends a user a Direct Message (DM) 📬",
-    help="If you have permission to make use of slash commands, you can also use `/dm`!",
-)
-async def dm(ctx, receiver: discord.User, *, message):
-    await ctx.message.delete()
-    success = await send_dm(ctx, receiver, message)
-    if success is True:
-        await ctx.send(
-            ctx.author.mention,
-            embed=discord.Embed(
-                title="DM sent! 📬",
-                description=f"Your DM was sucessfully sent to **{receiver}**",
-                color=discord.Color.green(),
-            ),
-        )
-    else:
-        embed = discord.Embed(
-            title="This user doesn't accept DMs from me. :frowning:",
-            description="Therefore, I wasn't able to send your message.",
-            color=discord.Color.red(),
-        )
-        await ctx.send(ctx.author.mention, embed=embed)
-
-
-@slash.slash(
-    name="dm",
-    description="Sends a user a Direct Message (DM) 📬",
-    options=[
-        dict(
-            name="receiver",
-            description="Who do you want to send the DM to?",
-            type=6,
-            required="true",
-        ),
-        dict(
-            name="message",
-            description="Your message (Nothing inappropiate or mean please)",
-            type=3,
-            required="true",
-        ),
-    ],
-)
-@commands.check(is_not_private)
-async def _dm(ctx, receiver: discord.User, message):
-    success = await send_dm(ctx, receiver, message)
-    if success is True:
-        await ctx.send(f"DM sent to **{receiver}**", hidden=True)
-    else:
-        await ctx.send(
-            f"Failed to send DM because **{receiver}** doesn't accept DMs from me",
-            hidden=True,
-        )
-        await ctx.send(hidden=True, embed=embed)
-
-
-async def send_dm(ctx, receiver: discord.User, message):
-    try:
-        to = receiver
-        channel = await to.create_dm()
-
-        embed = discord.Embed(
-            title="Direct Message",
-            description=message,
-            color=discord.Color.random(),
-            timestamp=datetime.datetime.now(),
-        )
-        embed.set_author(name=f"🖊 Author: {ctx.author}")
-        embed.set_thumbnail(url=ctx.author.avatar_url)
-        embed.set_footer(text=f"Server: {ctx.guild.name}", icon_url=ctx.guild.icon_url)
-        await channel.send(embed=embed)
-
-        dmlog = client.get_channel(814442695976157214)
-        await dmlog.send(f"the original was sent to *{to}*", embed=embed)
-    except discord.Forbidden:
-        return False
-    else:
-        return True
-
-
-@dm.error
-async def no_dm(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send(
-            "Please mention the **user** you want to sent the DM and the **message** you want to send them. :pencil2:"
-        )
-'''
-
 
 @slash.slash(name="invite", description="Add TimMcBot to your server!")
 async def _invite(ctx):
     invite = discord.Embed(
-        description="**[Click here to add TimMcBot to your server.](https://discord.com/api/oauth2/authorize?client_id=800377812699447306&permissions=4294967287&scope=bot%20applications.commands)**",
+        description="**[Click here to add TimMcBot to your server](https://discord.com/api/oauth2/authorize?client_id=800377812699447306&permissions=4294967287&scope=bot%20applications.commands)**",
         color=discord.Color.teal(),
     )
     invite.set_author(name="Add me to your server!", icon_url=client.user.avatar_url)
@@ -597,16 +563,22 @@ async def _invite(ctx):
 )
 async def invite(ctx):
     invite = discord.Embed(
-        description="**[Click here to add TimMcBot to your server.](https://discord.com/api/oauth2/authorize?client_id=800377812699447306&permissions=4294967287&scope=bot%20applications.commands)**",
+        description="**[Click here to add TimMcBot to your server](https://discord.com/api/oauth2/authorize?client_id=800377812699447306&permissions=4294967287&scope=bot%20applications.commands)**",
         color=get_client_color(ctx),
     )
     invite.set_author(name="Invite me to your server!", icon_url=client.user.avatar_url)
     await ctx.send(embed=invite)
 
+@client.command()
+async def status(ctx):
+    invite = discord.Embed(
+        description="**[Click here to see the TimMcBot status page](https://stats.uptimerobot.com/GzPzwhJ5KD)**",
+        color=get_client_color(ctx),
+    )
+    invite.set_author(name="TimMcBot status", icon_url=client.user.avatar_url)
+    await ctx.send(embed=invite)
 
 # errors:
-
-''''''
 
 
 @client.event
@@ -704,7 +676,7 @@ async def on_slash_command_error(ctx, ex):
     if isinstance(ex, discord_slash.error.CheckFailure):
         await ctx.send("This slash command doesn't work in Direct Messages! ⚠", hidden=True)
     else:
-        await ctx.send("Something went wrong! :frowning:")
+        await ctx.send("Something went wrong! :frowning:", hidden=True)
 
 # events:
 
@@ -741,10 +713,14 @@ async def on_message(message):
 
 @client.event
 async def on_ready():
-    await client.change_presence(
-        activity=discord.Activity(type=discord.ActivityType.watching, name=status)
-    )
+    #await client.change_presence(
+    #    activity=discord.Activity(type=discord.ActivityType.watching, name=status)
+    #)
     print(f"\n{client.user.name} is now online!\n")
+    save_data_on_db.start()
+    print(db["2048highscores"])
+    print(db["globalchat"])
+    print(db["prefixes"])
 
 
 @client.event
@@ -760,6 +736,17 @@ async def on_slash_command(ctx):
         f"[{ctx.author}]:\nSLASH_NAME = {ctx.name}\nGUILD = {ctx.guild.name}\nCHANNEl = {ctx.channel.name}\n"
     )
 
+
+# tasks
+
+@tasks.loop(seconds=20)
+async def save_data_on_db():
+    with open("json_files/2048highscores.json", "r") as d:
+        db["2048highscores"] = dict(json.load(d))
+    with open("json_files/globalchat.json", "r") as d:
+        db["globalchat"] = dict(json.load(d))
+    with open("json_files/prefixes.json", "r") as d:
+        db["prefixes"] = dict(json.load(d))
 
 # bot
 

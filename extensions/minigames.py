@@ -1,10 +1,13 @@
 import discord
-from random import randint
+from random import randint, choice
 from discord.ext import commands
 from main import assets, emojis, get_prefix, is_not_private, get_client_color
 import asyncio
 from minigames import tictactoe, viergewinnt, chess, othello
 import json
+import os
+from PIL import Image, ImageFilter, ImageEnhance
+from math import floor
 
 spiele = ["TicTacToe", "Connect4", "Chess", "Othello"]
 header_emojis = ["❌⭕", "4️⃣", "", ""]
@@ -66,6 +69,300 @@ class minigames(commands.Cog):
         self.client = client
         self.gtictactoe = {}
         self.gconnect4 = {}
+
+    @commands.command(name="2048", usage=":bulb: **How to play:**\nUse your arrow keys to move the tiles. When two tiles with the same number touch, they merge into one! Can you get the 2048 tile?\nIf you can't move the tiles anymore and can't merge two tiles into one, your game is over.\n")
+    async def twothousendtwentyfour(self, ctx):
+        with open("json_files/2048highscores.json", "r") as h:
+            highscores = json.load(h)
+
+        if not str(ctx.author.id) in highscores:
+            highscores[str(ctx.author.id)] = 0
+            with open("json_files/2048highscores.json", "w") as h:
+                json.dump(highscores, h, indent=4)
+
+        highscore = highscores[str(ctx.author.id)]
+
+        color = get_client_color(ctx)
+
+        embed = discord.Embed(title="New 2048 game", description="Is your internet connection good enough to **load images fast?**", color=color)
+        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/817155267816587326/828309605947539476/2048_1.png")
+        embed.set_author(name=str(ctx.author), icon_url=ctx.author.avatar_url)
+        message = await ctx.send(embed=embed)
+        await message.add_reaction("👍")
+        await message.add_reaction("👎")
+
+        def check(reaction, user):
+            return (
+                reaction.message.id == message.id
+                and user.id == ctx.author.id
+                and str(reaction.emoji) in ["👎","👍"]
+            )
+
+        reaction, user = await self.client.wait_for(
+            "reaction_add", check=check
+        )
+
+        if str(reaction.emoji) == "👎":
+            badinternet = True
+        else:
+            badinternet = False
+        
+        await message.delete()
+
+        arrows = ["◀","🔼","🔽","▶"]
+        score = 0
+        board = [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0]
+        zug_nr = 0
+        change = None
+        changed = True
+        win = False
+        game_over = False
+
+        def graphic():
+            img = Image.open('assets/2048/board.png')
+            i=0
+            for field in board:
+                if not field == 0:
+                    field_img = Image.open(f'assets/2048/{field}.png')
+                    field_img = field_img.resize((138,138))
+                    img.paste(field_img, (i%4*151+17, floor(i/4) * 151+17))
+                
+                i+=1
+
+            id = randint(0,9999999999)
+            img = img.resize((260,260))
+            img.save(f'temp_files/2048-{id}.png', optimize = True, compress_level = 20)
+            return id
+
+        def spawn_random():
+            #get items that are 0
+            empty = []
+            i = 0
+            for field in board:
+                if field == 0:
+                    empty.append(i)
+                i += 1
+            
+            #spawn random item
+            if not len(empty) == 0:
+                if randint(0,3) == 0:
+                    board[choice(empty)] = 4
+                else:
+                    board[choice(empty)] = 2
+            return
+
+        def process(arrow :int, old_score):
+            
+            score = old_score
+            change = 0
+            changed = False
+            if arrow == 0: #left
+                for iter in range(0,3):
+                    for i in range(15,0,-1):
+                        if not i % 4 == 0 or board[i] == 0:
+                            if board[i-1] == 0:
+                                board[i-1] = board[i]
+                                board[i] = 0
+                                changed = True
+                for i in range(0,15,1):
+                    if not i % 4 == 0 or board[i] == 0:
+                        if board[i-1] == board[i]:
+                            change += board[i]*2
+                            board[i-1] = board[i]*2
+                            board[i] = 0
+                for iter in range(0,3):
+                    for i in range(15,0,-1):
+                        if not i % 4 == 0 or board[i] == 0:
+                            if board[i-1] == 0:
+                                board[i-1] = board[i]
+                                board[i] = 0
+                                changed = True
+
+            if arrow == 1: #up
+                for iter in range(0,3):
+                    for i in range(15,3,-1):
+                        if not board[i] == 0:
+                            if board[i-4] == 0:
+                                board[i-4] = board[i]
+                                board[i] = 0
+                                changed = True
+                for i in range(3,15,1):
+                    if not board[i] == 0:
+                        if board[i-4] == board[i]:
+                            change += board[i]*2
+                            board[i-4] = board[i]*2
+                            board[i] = 0
+                for iter in range(0,3):
+                    for i in range(15,3,-1):
+                        if not board[i] == 0:
+                            if board[i-4] == 0:
+                                board[i-4] = board[i]
+                                board[i] = 0
+                                changed = True
+
+            if arrow == 2: #down
+                for iter in range(0,3):
+                    for i in range(0,12,1):
+                        if not board[i] == 0:
+                            if board[i+4] == 0:
+                                board[i+4] = board[i]
+                                board[i] = 0
+                                changed = True
+                for i in range(11,0,-1):
+                    if not board[i] == 0:
+                        if board[i+4] == board[i]:
+                            change += board[i]*2
+                            board[i+4] = board[i]*2
+                            board[i] = 0
+                for iter in range(0,3):
+                    for i in range(0,12,1):
+                        if not board[i] == 0:
+                            if board[i+4] == 0:
+                                board[i+4] = board[i]
+                                board[i] = 0
+                                changed = True
+
+            if arrow == 3: #right
+                for iter in range(0,3):
+                    for i in range(0,15,1):
+                        if not (i % 4 == 3 or board[i] == 0):
+                            if board[i+1] == 0:
+                                board[i+1] = board[i]
+                                board[i] = 0
+                                changed = True
+                for i in range(14,0,-1):
+                    if not i % 4 == 3 or board[i] == 0:
+                        if board[i+1] == board[i]:
+                            change += board[i]*2
+                            board[i+1] = board[i]*2
+                            board[i] = 0
+                for iter in range(0,3):
+                    for i in range(0,15,1):
+                        if not i % 4 == 3 or board[i] == 0:
+                            if board[i+1] == 0:
+                                board[i+1] = board[i]
+                                board[i] = 0
+                                changed = True
+            
+            score += change
+            return score, change != 0 or changed is True, change
+
+        while True:
+            if changed:
+                embed = discord.Embed(title="2048", color=color)
+
+                spawn_random()
+                output = ""
+                i = 0
+                
+                if badinternet is True:
+                    value = ""
+                    i = 0
+                    for field in board:
+                        if field == 0:
+                            field = ""
+                        for o in range(0,5-len(str(field))):
+                            value += " "
+                        value += f"{field} |"
+                        if i%4 == 3:
+                            value+="\n"
+                        i += 1
+                else:
+                    id = graphic()
+                    if zug_nr == 0:
+                        fileschannel = await self.client.fetch_channel(828285573860163595)
+                    else:
+                        await filemessage.delete()
+                    filemessage = await fileschannel.send(file=discord.File(f'temp_files/2048-{id}.png'))
+                    
+                    embed.set_image(url=filemessage.attachments[0].url)
+
+                game_over = False
+                if not 0 in board:
+                    for i in range(0,16,1):
+                        print(i)
+                        if not (i % 4 == 0 or board[i] == 0):
+                            if board[i-1] == board[i]:
+                                break
+                        if i > 3:
+                            if not board[i] == 0:
+                                if board[i-4] == board[i]:
+                                    break
+                        if i == 15:
+                            game_over = True
+                            embed.description = "**Game over!** React with ↩️ to play again!"                            
+
+                embed.set_author(name=str(ctx.author), icon_url=ctx.author.avatar_url)
+                if change is None:
+                    embed.add_field(name="Score:", value=f"```cs\n{score}```")
+                else:
+                    if highscore < score:
+                        highscore = score
+                        with open("json_files/2048highscores.json", "r") as h:
+                            highscores = json.load(h)
+
+                        highscores[str(ctx.author.id)] = highscore
+                        with open("json_files/2048highscores.json", "w") as h:
+                            json.dump(highscores, h, indent=4)
+
+                    embed.add_field(name="Score:", value=f"```cs\n{score} (+{change})```")
+                embed.add_field(name="Personal best:", value=f"```cs\n{highscore}```")
+
+                if badinternet is True:
+                    embed.add_field(name="Board:", value="```" + value + "```", inline=False)
+                else:
+                    os.remove(f'temp_files/2048-{id}.png')
+
+                if zug_nr == 0:
+                    message = await ctx.send(embed=discord.Embed(title="Please wait ...", color=discord.Color.random()))
+                    for emoji in arrows:
+                        await message.add_reaction(emoji)
+                await message.edit(embed=embed)
+
+                if game_over is True:
+                    await message.clear_reactions()
+                    await message.add_reaction("↩️")
+
+                    def check(reaction, user):
+                        return (
+                            reaction.message.id == message.id
+                            and user.id == ctx.author.id
+                            and str(reaction.emoji) == "↩️"
+                        )
+
+                    reaction, user = await self.client.wait_for(
+                        "reaction_add", check=check
+                    )
+
+
+                    score = 0
+                    board = [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0]
+                    zug_nr = 0
+                    change = None
+                    changed = True
+                    win = False
+                    game_over = False
+                    continue
+                    
+            def check(reaction, user):
+                return (
+                    reaction.message.id == message.id
+                    and user.id == ctx.author.id
+                    and str(reaction.emoji) in arrows
+                )
+
+            reaction, user = await self.client.wait_for(
+                "reaction_add", check=check
+            )
+
+            await reaction.remove(user)
+            arrow = arrows.index(str(reaction.emoji))
+            score, changed, change = process(arrow, score)
+            zug_nr += 1
+
+            if 2048 in board and win is False:
+                await ctx.channel.send(f"GG {ctx.author.mention}, you got the **2048 tile!** <:2048:828333452813795348> Well done!")
+                win = True
 
     @commands.command(
         enabled=False,
