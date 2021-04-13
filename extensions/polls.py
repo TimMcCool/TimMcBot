@@ -26,25 +26,8 @@ def get_poll_answer_options():
             ],
         ),
     ]
-    """
-  dict( 
-  name = "anonymous",
-  description =  "Do you want your poll to be anonymous?",
-  type =  5,
-  required =  "true"),
-  dict(
-  name = "strict",
-  description =  "Do you want your poll to be strict so users can only vote once?",
-  type =  5,
-  required =  "true"),
-  dict(
-  name = "question",
-  description =  "Question",
-  type =  3,
-  required =  "true")]
-  """
     alphabet = "abcdefghijklmnopqrst"
-    for i in range(0, 20):
+    for i in range(0, 19):
         options.append(
             dict(
                 name=f"choice_{alphabet[i]}",
@@ -100,7 +83,7 @@ class polls(commands.Cog):
                     embed = (message.embeds)[0]
 
                     embed.set_footer(
-                        text="This poll has been stopped.\nNew votes will automatically be removed."
+                        text="This poll has been closed.\nNew votes will automatically be removed."
                     )
                     data[str(payload.message_id)]["ended"] = True
 
@@ -129,27 +112,26 @@ class polls(commands.Cog):
                                 await reaction.remove(user)
                                 return
 
-    @cog_ext.cog_slash(
-        name="poll",
-        description="Start a poll (up to 20 choices)",
+    @cog_ext.cog_subcommand(
+        base="poll",
+        name="create",
+        description="Starts a poll (up to 19 choices)",
         options=get_poll_answer_options(),
     )
     @commands.check(is_not_private)
-    async def _poll_create(self, ctx, question, *data):
+    async def _poll_create(self, ctx, question, type, *choices):
         await ctx.defer(hidden=True)
-        data = list(data)
-        _type = int(data[0])
-        data[0] = question
         anonymous = False
         strict = False
-        if _type == 1 or _type == 3:
+        type = int(type)
+        if type == 1 or type == 3:
             anonymous = True
-        if _type == 2 or _type == 3:
+        if type == 2 or type == 3:
             strict = True
-        await poll_create(self, ctx, data, anonymous, strict, slash=True)
+        await poll_create(self, ctx, question, choices, anonymous, strict, slash=True)
 
     @cog_ext.cog_subcommand(
-        base="polls",
+        base="poll",
         name="results",
         description="Shows the results of a poll",
         options=[
@@ -168,41 +150,45 @@ class polls(commands.Cog):
     @commands.command(
         brief="Starts a normal poll",
         help="If you have permission to use slash commands, you can also use `/poll` to create polls!",
-        usage='**Yes/No polls:**\n```{0}poll "Do you like the color blue?"```\n**Multiple answer options (up to 20):**\n```{0}poll "What is your favorite color?" "Blue" "Green" "Yellow"```',
+        usage='**Yes/No polls:**\n```{0}poll "Do you like the color blue?"```\n**Multiple answer options (up to 19):**\n```{0}poll "What is your favorite color?" "Blue" "Green" "Yellow"```',
     )
+    @commands.bot_has_permissions(manage_messages=True)
     @commands.cooldown(3, 15, commands.BucketType.user)
-    async def poll(self, ctx, *data):
+    async def poll(self, ctx, question, *choices):
         await ctx.message.delete()
-        await poll_create(self, ctx, data, False, False)
+        await poll_create(self, ctx, question, choices, False, False)
 
     @commands.command(
         brief="Starts an anonymous poll",
         help="If you have permission to use slash commands, you can also use `/poll` to create polls!",
         description="Starts an anonymous poll that won't show the author's name.",
-        usage='**Yes/No polls:**\n```{0}anonymouspoll "Do you like anonymous polls?"```\n**Multiple answer options (up to 20):**\n```{0}anonymouspoll "What is your least favorite color?" "Blue" "Green" "Yellow"```',
+        usage='**Yes/No polls:**\n```{0}anonymouspoll "Do you like anonymous polls?"```\n**Multiple answer options (up to 19):**\n```{0}anonymouspoll "What is your least favorite color?" "Blue" "Green" "Yellow"```',
     )
+    @commands.bot_has_permissions(manage_messages=True)
     @commands.cooldown(3, 15, commands.BucketType.user)
-    async def anonymouspoll(self, ctx, *data):
+    async def anonymouspoll(self, ctx, question, *choices):
         await ctx.message.delete()
-        await poll_create(self, ctx, data, True, False)
+        await poll_create(self, ctx, question, choices, True, False)
 
     @commands.command(
         brief= "Starts a strict poll",
         help="If you have permission to use slash commands, you can also use `/poll` to create polls!",
         description="Starts a poll, but members won't be able to vote for multiple answer options.",
-        usage='**Yes/No polls:**\n```{0}strictpoll "Do you like strict polls?"```\n**Multiple answer options (up to 20):**\n```{0}strictpoll "What color do you like most?" "Blue" "Green" "Yellow"```',
+        usage='**Yes/No polls:**\n```{0}strictpoll "Do you like strict polls?"```\n**Multiple answer options (up to 19):**\n```{0}strictpoll "What color do you like most?" "Blue" "Green" "Yellow"```',
     )
+    @commands.bot_has_permissions(manage_messages=True)
     @commands.cooldown(3, 15, commands.BucketType.user)
-    async def strictpoll(self, ctx, *data):
+    async def strictpoll(self, ctx, question, *choices):
         await ctx.message.delete()
-        await poll_create(self, ctx, data, False, True)
+        await poll_create(self, ctx, question, choices, False, True)
 
     @commands.command(
-        brief="Shows all polls",
+        name="polls",
+        brief="Shows all polls of the server",
         description="Shows all polls on the server.",
-        aliases=["polls", "allpolls", "serverpolls"],
+        aliases=["pollslist", "serverpolls"],
     )
-    async def pollslist(self, ctx):
+    async def _polls(self, ctx):
         with open("json_files/polls.json", "r") as p:
             running_polls = json.load(p)
         embed = discord.Embed(
@@ -221,7 +207,7 @@ class polls(commands.Cog):
             if not running == "":
                 embed.add_field(name="**Running polls:**", value=running, inline=False)
             if not stopped == "":
-                embed.add_field(name="**Stopped polls:**", value=stopped, inline=False)
+                embed.add_field(name="**Closed polls:**", value=stopped, inline=False)
         else:
             embed.description = "No polls have been created on this server yet!"
         embed.set_thumbnail(url=ctx.guild.icon_url)
@@ -229,11 +215,11 @@ class polls(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(
-        help="You can also stop your polls by reacting with ❎!",
-        name="stop-poll",
-        brief="Stops a specific poll",
-        description="Allows you to stop one of your polls. New votes on stopped polls will automatically be removed.",
-        aliases=["stoppoll", "end-poll", "endpoll"],
+        help="You can also close your polls by reacting with ❎!",
+        name="close",
+        brief="Closes a specific poll",
+        description="Allows you to close one of your polls. New votes on closed polls will automatically be removed.",
+        aliases=["closepoll", "stop-poll", "stoppoll", "end-poll", "endpoll"],
     )
     async def stoppoll(self, ctx, poll_message_id):
         with open("json_files/polls.json", "r") as p:
@@ -373,15 +359,9 @@ async def poll_results(self, ctx, poll_message_id=None, slash=False):
             await ctx.send("No polls found on this server!")
 
 
-async def poll_create(self, ctx, data, anonymous, strict, *, slash=False):
-    options = list(data)
-    if not len(options) == 0:
-        question = options.pop(0)
-    else:
-        await ctx.send("Please specify a poll!")
-        return
-    if len(options) > 20:
-        options = options[:20]
+async def poll_create(self, ctx, question, options, anonymous, strict, *, slash=False):
+    options = list(options)
+    options = options[:19]
     if len(options) == 0:
         embed = discord.Embed(title=question, color=discord.Color.random())
         if strict is True:
@@ -443,13 +423,13 @@ async def poll_create(self, ctx, data, anonymous, strict, *, slash=False):
     await poll.add_reaction("❎")
     if slash is True:
         await ctx.send(
-            "Your **poll** has been **created!** You can stop it anytime by reacting with ❎",
+            "Your **poll** has been **created!** You can close it anytime by reacting with ❎",
             hidden=True,
         )
     else:
         await ctx.send(
-            "The **poll** has been **created!** The poll author can stop it anytime by reacting with ❎",
-            delete_after=15.0,
+            "The **poll** has been **created!** The poll author can close it anytime by reacting with ❎",
+            delete_after=5.0,
         )
 
 

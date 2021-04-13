@@ -8,9 +8,10 @@ authors = ["Your Name <you@example.com>"]
 python = "^3.8"
 flask = "^1.1.2"
 dhooks = "^1.1.4"
-discord = "^1.0.1"
 pandas = "^1.2.3"
 replit = "^3.0.0"
+scratchapi = "^1.4.1"
+discord = "^1.0.1"
 
 [tool.poetry.dev-dependencies]
 

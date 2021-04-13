@@ -29,14 +29,16 @@ class fun(commands.Cog):
     # commands
 
     @commands.command()
+    @commands.bot_has_permissions(attach_files=True)
+    @commands.cooldown(1, 2.7, commands.BucketType.user)
     async def blur(self, ctx, *, user: discord.User=None):
         if user is None:
             user = ctx.author
 
-        img = requests.get(str(user.avatar_url_as(size=128)), allow_redirects=True)
+        img = requests.get(user.avatar_url, allow_redirects=True)
         open(f'temp_files/blur{user.id}.png', 'wb').write(img.content)
 
-        filtered_img = Image.open(f'temp_files/blur{user.id}.png').filter(ImageFilter.GaussianBlur(4))
+        filtered_img = Image.open(f'temp_files/blur{user.id}.png').filter(ImageFilter.GaussianBlur(12))
         filtered_img.save(f'temp_files/blur{user.id}.png')
 
         await ctx.send(file=discord.File(f'temp_files/blur{user.id}.png'))
@@ -44,11 +46,13 @@ class fun(commands.Cog):
         os.remove(f'temp_files/blur{user.id}.png')
 
     @commands.command(aliases=["colourful"])
+    @commands.bot_has_permissions(attach_files=True)
+    @commands.cooldown(1, 2.7, commands.BucketType.user)
     async def colorful(self, ctx, *, user: discord.User=None):
         if user is None:
             user = ctx.author
 
-        img = requests.get(str(user.avatar_url_as(size=128)), allow_redirects=True)
+        img = requests.get(user.avatar_url, allow_redirects=True)
         open(f'temp_files/color{user.id}.png', 'wb').write(img.content)
 
         filtered_img = ImageEnhance.Color(Image.open(f'temp_files/color{user.id}.png'))
@@ -60,10 +64,25 @@ class fun(commands.Cog):
         os.remove(f'temp_files/color{user.id}.png')
 
     @commands.command(aliases=["blend"])
+    @commands.bot_has_permissions(attach_files=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def merge(self, ctx, user1 : discord.User, user2: discord.User):
         await merge(self, ctx, user1, user2)
 
-    @commands.command()
+    '''
+    @cog_ext.cog_slash(
+        name="blobchain",
+        description="Displays a very colorful chain of blobs",
+    )
+    async def _blobchain(self, ctx):
+        blobs = randint(1, 16)
+        blobchain = ""
+        for i in range(0, blobs):
+            blobchain = f"{blobchain}{emojis['blobchain']}"
+        await ctx.send(blobchain)  '''      
+
+    @commands.command(hidden=True)
+    @commands.bot_has_permissions(use_external_emojis=True)
     async def blobchain(self, ctx):
         blobs = randint(1, 16)
         blobchain = ""
@@ -78,21 +97,17 @@ class fun(commands.Cog):
     )
     async def dice(self, ctx):
         zahlen = ["one", "two", "three", "four", "five", "six"]
-        if ctx.author.nick == None:
-            user = ctx.author.name
-        else:
-            user = ctx.author.nick
         if randint(0, 6) == 6:
             await ctx.send(
                 embed=discord.Embed(
-                    description=f"☹ **{user} wanted to roll their dice, but then realized that they forgot it at home!** rip",
+                    description=f"☹ **{ctx.author.display_name} wanted to roll their dice, but then realized that they forgot it at home!** rip",
                     color=discord.Colour.random(),
                 )
             )
         else:
             await ctx.send(
                 embed=discord.Embed(
-                    description=f"🎲 **{user} rolled a {random.choice(zahlen)}!**",
+                    description=f"🎲 **{ctx.author.display_name} rolled a {random.choice(zahlen)}!**",
                     color=discord.Colour.random(),
                 )
             )
@@ -117,7 +132,7 @@ class fun(commands.Cog):
         while True:
             try:
                 reaction, user = await self.client.wait_for(
-                    "reaction_add", timeout=300.0, check=check
+                    "reaction_add", timeout=30.0, check=check
                 )
             except asyncio.TimeoutError:
                 if reactions == 0:
@@ -157,23 +172,20 @@ class fun(commands.Cog):
     async def _hardcorespoiler(self, ctx, message):
         await ctx.send(await hardcore_spoiler(ctx, message))
 
-    @commands.command(name="harcore-spoiler", aliases=["hardcorespoiler"])
-    async def hardcorespoiler(self, ctx, *, text=None):
+    @commands.command(name="spoiler", aliases=["spoilered", "harcore-spoiler","hardcorespoiler"])
+    @commands.bot_has_permissions(manage_webhooks=True, manage_messages=True)
+    async def hardcorespoiler(self, ctx, *, text):
         await ctx.message.delete()
-        await ctx.send(await hardcore_spoiler(ctx, text))
+        spoilered = await hardcore_spoiler(ctx, text)
+        if spoilered is None:
+            return
         webhook = await ctx.channel.create_webhook(
             name=ctx.channel.id,
             reason="A slash command that requires a webhook was run",
         )
-        spoilered = await hardcore_spoiler(ctx, message)
-        if ctx.author.nick is None:
-            await webhook.send(
-                spoilered, username=ctx.author.name, avatar_url=ctx.author.avatar_url
-            )
-        else:
-            await webhook.send(
-                spoilered, username=ctx.author.nick, avatar_url=ctx.author.avatar_url
-            )
+        await webhook.send(
+            spoilered, username=ctx.author.display_name, avatar_url=ctx.author.avatar_url
+        )
         await webhook.delete()
 
     @cog_ext.cog_slash(
@@ -207,28 +219,24 @@ class fun(commands.Cog):
         description="Gifts a member something cool! ~~actually rickrolls them~~",
         aliases=["prank"],
     )
-    async def rickroll(self, ctx, target: discord.Member):
+    @commands.bot_has_permissions(manage_messages=True)
+    async def rickroll(self, ctx, target: discord.Member=None):
         await ctx.message.delete()
-        await ctx.send(
-            f"{target.mention} {ctx.author.name} has gifted you **{random.choice(rickroll_wins)}!** :tada:",
-            embed=discord.Embed(
-                description="**[Click here to claim it!](http://alturl.com/7y5we)** :boom:",
-                color=discord.Colour.blue(),
-            ),
-        )
-
-    @commands.Cog.listener()
-    @rickroll.error
-    async def rickroll_mrq(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.message.delete()
-            await ctx.send("You gotta mention someone to ||rickroll||. :eyes:")
+        if target is None:
+            await ctx.send(
+                "https://media.tenor.com/images/59de4445b8319b9936377ec90dc5b9dc/tenor.gif"
+            )
+        else:
+            await ctx.send(
+                f"{target.mention} {ctx.author.name} has gifted you **{random.choice(rickroll_wins)}!** :tada:",
+                embed=discord.Embed(
+                    description="**[Click here to claim it!](http://alturl.com/7y5we)** :boom:",
+                    color=discord.Colour.blue(),
+                ),
+            )
 
     @commands.command()
-    async def clap(self, ctx, *, text=None):
-        if text == None:
-            await ctx.send("What am I supposed to say?")
-            return
+    async def clap(self, ctx, *, text):
         output = ""
         o = 0
         for i in text:
@@ -240,14 +248,8 @@ class fun(commands.Cog):
         await ctx.send(output)
 
     @commands.command(aliases=["backwards", "umgedreht"])
-    async def reverse(self, ctx, *, text=None):
-        if text == None:
-            await ctx.send("Please also enter a text so I can esrever it!")
-            return
-        output = ""
-        for i in text:
-            if not i == "|":
-                output = f"{i}{output}"
+    async def reverse(self, ctx, *, text):
+        output = "".join(reversed(text))
         if "@everyone" in output or "@here" in output:
             await ctx.send("STOP PINGING! :angry:")
         elif "<@&" in output:
@@ -274,21 +276,18 @@ class fun(commands.Cog):
         await ctx.send(await emojify(ctx, message))
 
     @commands.command(brief="Emojifies your message")
-    async def emojify(self, ctx, *, text=None):
+    async def emojify(self, ctx, *, text):
         await ctx.message.delete()
+        emojified = await emojify(ctx, text)
+        if emojified is None:
+            return
         webhook = await ctx.channel.create_webhook(
             name=ctx.channel.id,
             reason="A slash command that requires a webhook was run",
         )
-        emojified = await emojify(ctx, text)
-        if ctx.author.nick is None:
-            await webhook.send(
-                emojified, username=ctx.author.name, avatar_url=ctx.author.avatar_url
-            )
-        else:
-            await webhook.send(
-                emojified, username=ctx.author.nick, avatar_url=ctx.author.avatar_url
-            )
+        await webhook.send(
+            emojified, username=ctx.author.display_name, avatar_url=ctx.author.avatar_url
+        )
         await webhook.delete()
 
     @commands.command(name="8ball", aliases=["ask"])
@@ -319,9 +318,7 @@ class fun(commands.Cog):
             "Concentrate and ask again.",
             "I'm tired. :sleeping: Please ask me again later.",
         ]
-        if question == None:
-            await ctx.send("You didn't ask anything. :thinking:")
-        elif "@everyone" in question or "@here" in question:
+        if "@everyone" in question or "@here" in question:
             await ctx.send("STOP PINGING! :angry:")
         elif "<@&" in question:
             await ctx.send(
@@ -334,11 +331,6 @@ class fun(commands.Cog):
 
 
 async def hardcore_spoiler(ctx, text):
-    if text == None:
-        await ctx.send(
-            "Please also enter a text so I can write it with ||S||||p||||o||||i||||l||||e||||r||||s||!"
-        )
-        return
     output = ""
     for i in text:
         if not i == "|":
@@ -347,11 +339,6 @@ async def hardcore_spoiler(ctx, text):
 
 
 async def emojify(ctx, text):
-    if text == None:
-        await ctx.send(
-            "Please also enter a text so I can :regional_indicator_e: :regional_indicator_m: :regional_indicator_o: :regional_indicator_j: :regional_indicator_i: :regional_indicator_f: :regional_indicator_y: it!"
-        )
-        return
     output = ""
     symbols = {"$": ":heavy_dollar_sign:", "!": ":exclamation:", "?": ":question:"}
     alpha = True
@@ -384,15 +371,15 @@ async def emojify(ctx, text):
     return output
 
 async def merge(self, ctx, user1, user2):
-    image1 = requests.get(str(user1.avatar_url_as(size=128)), allow_redirects=True)
+    image1 = requests.get(user1.avatar_url, allow_redirects=True)
     open(f'temp_files/merge{user1.id}.png', 'wb').write(image1.content)
-    image1 = Image.open(f'temp_files/merge{user1.id}.png').convert('RGB')
+    image1 = Image.open(f'temp_files/merge{user1.id}.png').convert('RGB').resize((1024,1024))
 
     os.remove(f'temp_files/merge{user1.id}.png')
 
-    image2 = (requests.get(str(user2.avatar_url_as(size=128)), allow_redirects=True))
+    image2 = (requests.get(user2.avatar_url, allow_redirects=True))
     open(f'temp_files/merge{user2.id}.png', 'wb').write(image2.content)
-    image2 = Image.open(f'temp_files/merge{user2.id}.png').convert('RGB')
+    image2 = Image.open(f'temp_files/merge{user2.id}.png').convert('RGB').resize((1024,1024))
 
     os.remove(f'temp_files/merge{user2.id}.png')
 

@@ -11,7 +11,7 @@ from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option, create_choice
 from replit import db
 
-#getting data from replit database (this is a TEMPORARY solution)
+#getting data from replit database
 gaws = dict(db['giveaways'])
 for key in list(gaws.keys()):
     gaws[key] = dict(gaws[key])
@@ -31,15 +31,15 @@ questions = [
 ]
 
 descriptions = [
-    None,
+    "",
     "Enter the duration like that:\n```glsl\n3 weeks = 3w\n1 day and 20 hours = 1d, 20h\n30 minutes and 10 seconds = 30m, 10s```",
     "Enter a number between 0 and 99.",
     "Name it, mention it or reply with its id.",
     "Name it, mention it or reply with its id.",
-    None,
-    None,
+    "",
+    "",
     "Name it, reply with its id or send an invite link to the server.",
-    None,
+    "",
 ]
 
 footer = "'skip' if there is none | 'finish' to skip all upcoming questions"
@@ -70,7 +70,6 @@ async def create_giveaway(self, ctx, data=None):
         "level",
         "author",
     ]
-    global gaws
 
     if data is None:
         data, q = {}, 0
@@ -239,11 +238,12 @@ async def create_giveaway(self, ctx, data=None):
                         for char in msg.content:
                             if char.isdigit():
                                 last_ans = f"{last_ans}{char}"
-                        try:
+                        if last_ans == "":
+                            channel = None
+                        else:
                             last_ans = int(last_ans)
-                            channel = await self.client.fetch_channel(last_ans)
-                            channel.id
-                        except Exception:
+                            channel = discord.utils.get(ctx.guild.channels, id=last_ans)
+                        if channel is None:
                             channel = discord.utils.get(ctx.guild.channels, name=msg.content)
                             if channel is None:
                                 await ctx.send(
@@ -256,7 +256,18 @@ async def create_giveaway(self, ctx, data=None):
                                 error = True
                                 continue
                             else:
-                                last_ans = channel.id
+                                last_ans = channel.id   
+                        perms = channel.permissions_for(ctx.author)
+                        if perms.send_messages is False or perms.view_channel is False:
+                            await ctx.send(
+                                embed=discord.Embed(
+                                    title="Error",
+                                    description="You are **not allowed to create giveaways in this channel** because you can't send messages there!\nPlease choose another channel.",
+                                    color=discord.Colour.red(),
+                                )
+                            )
+                            error = True
+                            continue                                 
                     elif q == 4:
                         for char in msg.content:
                             if char.isdigit():
@@ -390,7 +401,7 @@ async def create_giveaway(self, ctx, data=None):
         )
     except Exception:
         embed = discord.Embed(
-            title="Error", description="Please try again!", color=discord.Colour.red()
+            title="Error", description="Could not create your giveaway.", color=discord.Colour.red()
         )
     else:
         embed = discord.Embed(
@@ -417,9 +428,15 @@ class giveaways(commands.Cog):
         keys = list(gaws.keys())
         keys.reverse()
         for gaw in keys:
+            with open("json_files/giveaways.json", "r") as g:
+                gaws = json.load(g)
             try:
                 data = gaws[gaw]
                 ends = datetime.strptime(data["endtime"], "%m/%d/%Y, %H:%M:%S")
+                if (ends + timedelta(days=14)) < datetime.now():
+                    gaws.pop(gaw)
+                    with open("json_files/giveaways.json", "w") as g:
+                        json.dump(gaws, g, indent=4)
                 if ends < datetime.now() and data["ended"] is False:
                     data["ended"] = True
                     try:
@@ -433,6 +450,7 @@ class giveaways(commands.Cog):
                     with open("json_files/giveaways.json", "w") as g:
                         json.dump(gaws, g, indent=4)
                     try:
+                        member = await self.client.fetch_user(data["author"])
                         channel = await self.client.fetch_channel(data["channel"])
                         msg = await channel.fetch_message(int(gaw))
                         try:
@@ -441,13 +459,14 @@ class giveaways(commands.Cog):
                                 continue
                         except Exception:
                             pass
+                        try:
+                            await msg.remove_reaction("🎉", self.client.user)
+                        except Exception:
+                            pass
                         for reaction in msg.reactions:
                             if reaction.emoji == "🎉":
-                                users, potwinners = await reaction.users().flatten(), []
+                                potwinners = await reaction.users().flatten()
                                 break
-                        for user in users:
-                            if user.bot == False:
-                                potwinners.append(user)
                         count = data["winners"]
                         winners = None
                         if count == 0:
@@ -486,7 +505,7 @@ class giveaways(commands.Cog):
                             color=discord.Colour.random(),
                             timestamp=ends,
                         )
-                        embed.set_author(name="🎊 Ended Giveaway")
+                        embed.set_author(name="🎊 Ended Giveaway", icon_url=member.avatar_url)
                         embed.set_footer(text="Ended at")
                         try:
                             await msg.edit(content=None, embed=embed)
@@ -498,10 +517,11 @@ class giveaways(commands.Cog):
                         )
                         if reroll is True:
                             embed.set_author(name="🔄 Your giveaway has been rerolled")
+                            embed.set_footer(text="You will be able to reroll it again for 14 days.")
                         else:
                             embed.set_author(name="🎉 Your giveaway has ended")
+                            embed.set_footer(text="You will be able to reroll it for 14 days.")
                         try:
-                            member = await self.client.fetch_user(data["author"])
                             channel = await member.create_dm()
                             await channel.send(embed=embed)
                         except Exception:
@@ -510,10 +530,11 @@ class giveaways(commands.Cog):
                         pass
             except Exception:
                 pass
+            db['giveaways'] = gaws
 
     @cog_ext.cog_slash(
         name="giveaway",
-        description="Create a neat giveaway!",
+        description="Creates a neat giveaway!",
         options=[
             dict(
                 name="prize",
@@ -571,7 +592,6 @@ class giveaways(commands.Cog):
             ),
         ],
     )
-    @commands.check(is_not_private)
     async def _create_giveaway(
         self,
         ctx,
@@ -604,6 +624,10 @@ class giveaways(commands.Cog):
 
         await ctx.defer()
 
+        if not str(channel.type) == "text":
+            await ctx.send(embed=discord.Embed(title="Error", description="The selected channel isn't a text channel!", color=discord.Color.red()))
+            return
+            
         data = {}
         data["name"] = prize
 
@@ -663,6 +687,18 @@ class giveaways(commands.Cog):
             return
         data["winners"] = winners
         data["channel"] = channel
+
+        perms = channel.permissions_for(ctx.author)
+        if perms.send_messages is False or perms.view_channel is False:
+            await ctx.send(
+                embed=discord.Embed(
+                    title="Error",
+                    description="You are **not allowed to create giveaways in this channel** because you can't send messages there!",
+                    color=discord.Colour.red(),
+                )
+            )
+            return
+
         data["role"] = required_role
         data["messages"] = required_messages
         data["invites"] = required_invites
@@ -711,8 +747,76 @@ class giveaways(commands.Cog):
 
         await create_giveaway(self, ctx, data)
 
+    @commands.command(
+        help="If you have permission to use slash commands, you can also use type `/giveaway`!",
+        brief="Create a neat giveaway",
+        description="Starts the process to create a giveaway.",
+        aliases=["giveaway", "gstart"],
+    )
+    @commands.bot_has_permissions(manage_messages=True)
+    @commands.cooldown(1, 15, commands.BucketType.user)
+    async def gcreate(self, ctx):
+        embed = discord.Embed(
+            title="Please answer the questions",
+            description=f"You have **5 minutes** for each question.\nYou can stop the process anytime by typing **`cancel`**",
+            color=discord.Colour.green(),
+        )
+        embed.set_author(name="🎁 Create a giveaway", icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=embed)
+
+        await create_giveaway(self, ctx)
+
     @cog_ext.cog_subcommand(
-        base="giveaways",
+        base="gw",
+        name="end",
+        description="Ends one of your running giveaways early.",
+        options=[
+            dict(
+                name="giveaway_message_id",
+                description="The message id of the giveaway you want to end.",
+                type=3,
+                required="true",
+            )
+        ],
+    )
+    @commands.check(is_not_private)
+    async def _end_giveaway(self, ctx, giveaway_message_id):
+        await end(self, ctx, giveaway_message_id, slash=True)
+
+    @commands.command(
+        brief="Ends a giveaways early",
+        description="Allows you to end one of your giveaways early. The giveaway must be hosted by you.",
+    )
+    async def end(self, ctx, giveaway_message_id):
+        prefix = get_prefix(self.client, ctx.message)[1]
+        await end(self, ctx, giveaway_message_id, prefix=prefix)
+
+    @cog_ext.cog_subcommand(
+        base="gw",
+        name="cancel",
+        description="Cancels one of your running giveaways.",
+        options=[
+            dict(
+                name="giveaway_message_id",
+                description="The message id of the giveaway you want to cancel.",
+                type=3,
+                required="true",
+            )
+        ],
+    )
+    @commands.check(is_not_private)
+    async def _cancel_giveaway(self, ctx, giveaway_message_id):
+        await cancel(self, ctx, giveaway_message_id, slash=True)
+
+    @commands.command(
+        brief="Cancels a giveaway",
+        description="Allows you to cancel one of your giveaways. The giveaway must be hosted by you.",
+    )
+    async def cancel(self, ctx, giveaway_message_id):
+        await cancel(self, ctx, giveaway_message_id)
+
+    @cog_ext.cog_subcommand(
+        base="gw",
         name="reroll",
         description="Rerolls one of your ended giveaways.",
         options=[
@@ -727,104 +831,6 @@ class giveaways(commands.Cog):
     @commands.check(is_not_private)
     async def _reroll_giveaway(self, ctx, giveaway_message_id=None):
         await reroll(self, ctx, giveaway_message_id, slash=True)
-
-    @commands.command(
-        help="If you have permission to use slash commands, you can also use type `/giveaway`!",
-        brief="Creates a giveaway",
-        description="Starts the process to create a giveaway.",
-        aliases=["giveaway", "gstart"],
-    )
-    @commands.cooldown(1, 10, commands.BucketType.user)
-    async def gcreate(self, ctx):
-        embed = discord.Embed(
-            title="Please answer the questions",
-            description=f"You have **5 minutes** for each question.\nYou can stop the process anytime by typing **`cancel`**",
-            color=discord.Colour.green(),
-        )
-        embed.set_author(name="🎁 Create a giveaway", icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=embed)
-
-        await create_giveaway(self, ctx)
-
-    @commands.command(
-        brief="Ends a giveaways early",
-        description="Allows you to end one of your giveaways early. The giveaway must be hosted by you.",
-    )
-    async def end(self, ctx, giveaway_message_id):
-        prefix = get_prefix(self.client, ctx.message)[1]
-        with open("json_files/giveaways.json", "r") as g:
-            gaws = json.load(g)
-        if giveaway_message_id in gaws:
-            data = gaws[giveaway_message_id]
-            if data["author"] == ctx.author.id:
-                if data["ended"] is True:
-                    await ctx.send(
-                        f"That giveaway **already ended!** :confetti_ball: To reroll giveaways, use `{prefix}reroll <giveaway_message_id>`."
-                    )
-                else:
-                    data["endtime"] = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
-                    gaws[giveaway_message_id] = data
-
-                    db['giveaways'] = gaws
-                    with open("json_files/giveaways.json", "w") as g:
-                        json.dump(gaws, g, indent=4)
-                    self.manage_gaws.restart()
-                    await ctx.message.add_reaction(emojis["checkmark"])
-            else:
-                await ctx.send(
-                    "That giveaway was **hosted by someone else!** You can't end other's giveaways."
-                )
-        else:
-            await ctx.send(
-                "Couldn't find your giveaway! Please make sure you entered the **correct message id.**"
-            )
-
-    @commands.command(
-        brief="Cancels a giveaway",
-        description="Allows you to cancel one of your giveaways. The giveaway must be hosted by you.",
-    )
-    async def cancel(self, ctx, giveaway_message_id):
-        with open("json_files/giveaways.json", "r") as g:
-            gaws = json.load(g)
-        if giveaway_message_id in gaws:
-            data = gaws[giveaway_message_id]
-            if data["author"] == ctx.author.id:
-                if data["ended"] is True:
-                    await ctx.send(
-                        "That giveaway **already ended!** :confetti_ball: You can't cancel it anymore."
-                    )
-                else:
-                    channel = await self.client.fetch_channel(data["channel"])
-                    gaws.pop(giveaway_message_id)
-
-                    db['giveaways'] = gaws
-                    with open("json_files/giveaways.json", "w") as g:
-                        json.dump(gaws, g, indent=4)
-                    message = await channel.fetch_message(int(giveaway_message_id))
-                    await message.edit(
-                        embed=discord.Embed(
-                            title="This giveaway was cancelled.",
-                            color=discord.Color.red(),
-                        )
-                    )
-                    await message.clear_reactions()
-                    embed = discord.Embed(
-                        description=f"The giveaway for **{data['name']}** has been cancelled.",
-                        color=discord.Color.random(),
-                    )
-                    embed.set_author(
-                        name="✖ Giveaway cancelled", icon_url=ctx.author.avatar_url
-                    )
-                    await ctx.message.add_reaction(emojis["checkmark"])
-                    await ctx.send(embed=embed)
-            else:
-                await ctx.send(
-                    "That giveaway was **hosted by someone else!** You can't cancel other's giveaways."
-                )
-        else:
-            await ctx.send(
-                "Couldn't find your giveaway! Please make sure you entered the **correct message id.**"
-            )
 
     @commands.command(
         brief="Rerolls a giveaway",
@@ -983,6 +989,37 @@ class giveaways(commands.Cog):
                         except Exception:
                             pass
 
+async def end(self, ctx, giveaway_message_id, *, prefix="/gw ", slash=False):
+    with open("json_files/giveaways.json", "r") as g:
+        gaws = json.load(g)
+    if giveaway_message_id in gaws:
+        data = gaws[giveaway_message_id]
+        if data["author"] == ctx.author.id:
+            if data["ended"] is True:
+                error = f"That giveaway **already ended!** :confetti_ball: To reroll giveaways, use `{prefix}reroll <giveaway_message_id>`."
+            else:
+                if slash is True:
+                    await ctx.defer()
+                data["endtime"] = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+                gaws[giveaway_message_id] = data
+
+                db['giveaways'] = gaws
+                with open("json_files/giveaways.json", "w") as g:
+                    json.dump(gaws, g, indent=4)
+                self.manage_gaws.restart()
+                if slash is True:
+                    await ctx.send("👌 alright, the giveaway will be ended!")
+                else:
+                    await ctx.message.add_reaction(emojis["checkmark"])
+                return
+        else:
+            error = "That giveaway was **hosted by someone else!** You can't end other's giveaways."
+    else:
+        error = "Couldn't find your giveaway! Please make sure you entered the **correct message id.**"
+    if slash is True:
+        await ctx.send(error, hidden=True)
+    else:
+        await ctx.send(error)
 
 async def reroll(self, ctx, giveaway_message_id, *, slash=False):
     with open("json_files/giveaways.json", "r") as g:
@@ -1021,16 +1058,16 @@ async def reroll(self, ctx, giveaway_message_id, *, slash=False):
                 embed.set_author(
                     name="🔄 Giveaway Reroll", icon_url=ctx.author.avatar_url
                 )
+                reminder = await ctx.send(embed=embed)
                 if slash is True:
-                    await ctx.defer()
-                reminder = await ctx.channel.send(embed=embed)
+                    reminder = ctx.message
 
                 await reminder.add_reaction("✅")
                 await reminder.add_reaction("❌")
 
                 def check(reaction, user):
                     return (
-                        reaction.message == reminder
+                        reaction.message.id == reminder.id
                         and user.id == ctx.author.id
                         and not user.bot
                         and str(reaction.emoji) in ["✅", "❌"]
@@ -1052,10 +1089,11 @@ async def reroll(self, ctx, giveaway_message_id, *, slash=False):
                     await reminder.clear_reactions()
                 else:
                     if str(reaction.emoji) == "❌":
-                        await ctx.send("👌 ok, the giveaway won't be rerolled then.")
+                        await ctx.channel.send("👌 ok, the giveaway won't be rerolled then.")
                     if str(reaction.emoji) == "✅":
-                        await ctx.send("👌 alright, the giveaway will be rerolled!")
+                        await ctx.channel.send("👌 alright, the giveaway will be rerolled!")
                         data["ended"] = False
+                        gaws.pop(giveaway_message_id)
                         gaws[giveaway_message_id] = data
 
                         db['giveaways'] = gaws
@@ -1064,7 +1102,7 @@ async def reroll(self, ctx, giveaway_message_id, *, slash=False):
                         self.manage_gaws.restart()
                 return
             else:
-                error = f"That giveaway **hasn't ended yet! :confetti_ball:** You can only reroll ended giveaways.\n*If you want to end the giveaway early, type `+end {giveaway_message_id}`.*"
+                error = f"That giveaway **hasn't ended yet! 🎁** You can only reroll ended giveaways."
         else:
             error = "That giveaway was **hosted by someone else!** You can't reroll other's giveaways."
     else:
@@ -1074,6 +1112,50 @@ async def reroll(self, ctx, giveaway_message_id, *, slash=False):
     else:
         await ctx.send(error)
 
+async def cancel(self, ctx, giveaway_message_id, slash=False):
+    with open("json_files/giveaways.json", "r") as g:
+        gaws = json.load(g)
+    if giveaway_message_id in gaws:
+        data = gaws[giveaway_message_id]
+        if data["author"] == ctx.author.id:
+            if data["ended"] is True:
+                error = "That giveaway **already ended!** :confetti_ball: You can't cancel it anymore."
+            else:
+                if slash is True:
+                    await ctx.defer()
+                channel = await self.client.fetch_channel(data["channel"])
+                gaws.pop(giveaway_message_id)
+
+                db['giveaways'] = gaws
+                with open("json_files/giveaways.json", "w") as g:
+                    json.dump(gaws, g, indent=4)
+                message = await channel.fetch_message(int(giveaway_message_id))
+                await message.edit(
+                    embed=discord.Embed(
+                        title="This giveaway was cancelled.",
+                        color=discord.Color.red(),
+                    )
+                )
+                await message.clear_reactions()
+                embed = discord.Embed(
+                    description=f"The giveaway for **{data['name']}** has been cancelled.",
+                    color=discord.Color.random(),
+                )
+                embed.set_author(
+                    name="✖ Giveaway cancelled", icon_url=ctx.author.avatar_url
+                )
+                if slash is False:
+                    await ctx.message.add_reaction(emojis["checkmark"])
+                await ctx.send(embed=embed)
+                return
+        else:
+            error = "That giveaway was **hosted by someone else!** You can't cancel other's giveaways."
+    else:
+        error = "Couldn't find your giveaway! Please make sure you entered the **correct message id.**"
+    if slash is True:
+        await ctx.send(error, hidden=True)
+    else:
+        await ctx.send(error)
 
 async def join_failure(member, reactions, *, text, url=None):
     for item in reactions:

@@ -71,6 +71,7 @@ class minigames(commands.Cog):
         self.gconnect4 = {}
 
     @commands.command(name="2048", usage=":bulb: **How to play:**\nUse your arrow keys to move the tiles. When two tiles with the same number touch, they merge into one! Can you get the 2048 tile?\nIf you can't move the tiles anymore and can't merge two tiles into one, your game is over.\n")
+    @commands.cooldown(1, 19, commands.BucketType.user)
     async def twothousendtwentyfour(self, ctx):
         with open("json_files/2048highscores.json", "r") as h:
             highscores = json.load(h)
@@ -84,7 +85,8 @@ class minigames(commands.Cog):
 
         color = get_client_color(ctx)
 
-        embed = discord.Embed(title="New 2048 game", description="Is your internet connection good enough to **load images fast?**", color=color)
+        embed = discord.Embed(title="New 2048 game", description="Do you want to see the **board as picture?**", color=color)
+        embed.set_footer(text="This looks better, but can slow down gameplay")
         embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/817155267816587326/828309605947539476/2048_1.png")
         embed.set_author(name=str(ctx.author), icon_url=ctx.author.avatar_url)
         message = await ctx.send(embed=embed)
@@ -247,6 +249,7 @@ class minigames(commands.Cog):
             score += change
             return score, change != 0 or changed is True, change
 
+        spawn_random()
         while True:
             if changed:
                 embed = discord.Embed(title="2048", color=color)
@@ -271,8 +274,6 @@ class minigames(commands.Cog):
                     id = graphic()
                     if zug_nr == 0:
                         fileschannel = await self.client.fetch_channel(828285573860163595)
-                    else:
-                        await filemessage.delete()
                     filemessage = await fileschannel.send(file=discord.File(f'temp_files/2048-{id}.png'))
                     
                     embed.set_image(url=filemessage.attachments[0].url)
@@ -280,7 +281,6 @@ class minigames(commands.Cog):
                 game_over = False
                 if not 0 in board:
                     for i in range(0,16,1):
-                        print(i)
                         if not (i % 4 == 0 or board[i] == 0):
                             if board[i-1] == board[i]:
                                 break
@@ -293,6 +293,7 @@ class minigames(commands.Cog):
                             embed.description = "**Game over!** React with ↩️ to play again!"                            
 
                 embed.set_author(name=str(ctx.author), icon_url=ctx.author.avatar_url)
+                embed.set_footer(text="Play the original game at www.play2048.co")
                 if change is None:
                     embed.add_field(name="Score:", value=f"```cs\n{score}```")
                 else:
@@ -337,6 +338,7 @@ class minigames(commands.Cog):
 
                     score = 0
                     board = [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0]
+                    spawn_random()
                     zug_nr = 0
                     change = None
                     changed = True
@@ -637,35 +639,10 @@ class minigames(commands.Cog):
         description="Play tictactoe against a server member! \nThis command starts a local tictactoe game.",
         aliases=["tic-tac-toe"],
     )
+    @commands.bot_has_permissions(manage_messages=True)
     @commands.cooldown(2, 10, commands.BucketType.user)
-    async def tictactoe(self, ctx, opponent: discord.Member):
-        board, turn, won, spiel, channel = (
-            [0, 0, 0, 0, 0, 0, 0, 0, 0],
-            0,
-            0,
-            0,
-            [ctx.channel],
-        )
-        accepted = await challenge(self, ctx.author, opponent, spiel, channel)
-        if accepted:
-            if randint(0, 1) == 0:
-                players = [ctx.author, opponent]
-            else:
-                players = [opponent, ctx.author]
-
-            message = await create_emojis(
-                channel, react_emojis[spiel], "The game is starting ...", players
-            )
-            content = tictactoe.update(board)
-            await create_card(
-                players[0], players[1], spiel, content, turn, won, message, players
-            )
-            await ingame(self, channel, players, board, turn, spiel, message)
-
-    @commands.Cog.listener()
-    @tictactoe.error
-    async def tictactoe_open(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
+    async def tictactoe(self, ctx, opponent: discord.Member=None):
+        if opponent is None:
             board, turn, won, spiel, channel = (
                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
                 0,
@@ -691,84 +668,40 @@ class minigames(commands.Cog):
                     players[0], players[1], spiel, content, turn, won, message, players
                 )
                 await ingame(self, channel, players, board, turn, spiel, message)
+        else:
+            board, turn, won, spiel, channel = (
+                [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                0,
+                0,
+                0,
+                [ctx.channel],
+            )
+            accepted = await challenge(self, ctx.author, opponent, spiel, channel)
+            if accepted:
+                if randint(0, 1) == 0:
+                    players = [ctx.author, opponent]
+                else:
+                    players = [opponent, ctx.author]
+
+                message = await create_emojis(
+                    channel, react_emojis[spiel], "The game is starting ...", players
+                )
+                content = tictactoe.update(board)
+                await create_card(
+                    players[0], players[1], spiel, content, turn, won, message, players
+                )
+                await ingame(self, channel, players, board, turn, spiel, message)
+
 
     @commands.command(
         help="If you don't mention an opponent, an open game anyone can join will be started.",
         description="Play connect4 against a server member!\nThis command starts a local connect4 game.",
         aliases=["connect-4", "viergewinnt", "4gewinnt"],
     )
+    @commands.bot_has_permissions(manage_messages=True)
     @commands.cooldown(2, 10, commands.BucketType.user)
-    async def connect4(self, ctx, opponent: discord.Member):
-        board, turn, won, spiel, channel = (
-            [
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-            ],
-            0,
-            0,
-            1,
-            [ctx.channel],
-        )
-        accepted = await challenge(self, ctx.author, opponent, spiel, channel)
-        if accepted:
-            if randint(0, 1) == 0:
-                players = [ctx.author, opponent]
-            else:
-                players = [opponent, ctx.author]
-
-            message = await create_emojis(
-                channel, react_emojis[spiel], "The game is starting ...", players
-            )
-            content = viergewinnt.update(board)
-            await create_card(
-                players[0], players[1], spiel, content, turn, won, message, players
-            )
-            await ingame(self, channel, players, board, turn, spiel, message)
-
-    @commands.Cog.listener()
-    @connect4.error
-    async def viergewinnt_open(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
+    async def connect4(self, ctx, opponent: discord.Member=None):
+        if opponent is None:
             board, turn, won, spiel, channel = (
                 [
                     0,
@@ -837,6 +770,72 @@ class minigames(commands.Cog):
                     players[0], players[1], spiel, content, turn, won, message, players
                 )
                 await ingame(self, channel, players, board, turn, spiel, message)
+        else:        
+            board, turn, won, spiel, channel = (
+                [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                ],
+                0,
+                0,
+                1,
+                [ctx.channel],
+            )
+            accepted = await challenge(self, ctx.author, opponent, spiel, channel)
+            if accepted:
+                if randint(0, 1) == 0:
+                    players = [ctx.author, opponent]
+                else:
+                    players = [opponent, ctx.author]
+
+                message = await create_emojis(
+                    channel, react_emojis[spiel], "The game is starting ...", players
+                )
+                content = viergewinnt.update(board)
+                await create_card(
+                    players[0], players[1], spiel, content, turn, won, message, players
+                )
+                await ingame(self, channel, players, board, turn, spiel, message)
 
     @commands.command(
         brief="Starts a global connect4 game (across servers)",
@@ -851,6 +850,7 @@ class minigames(commands.Cog):
             "global-4gewinnt",
         ],
     )
+    @commands.bot_has_permissions(manage_messages=True)
     async def globalconnect4(self, ctx):
         author = ctx.author
         author: discord.User
@@ -945,6 +945,7 @@ class minigames(commands.Cog):
         description="Starts a global TicTacToe game.\nIf someone else runs the command, you'll be matched with them.",
         aliases=["gtictactoe", "globaltictactoe"],
     )
+    @commands.bot_has_permissions(manage_messages=True)
     async def globaltictactoe(self, ctx):
         author = ctx.author
         author: discord.User

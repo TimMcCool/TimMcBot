@@ -195,19 +195,15 @@ class leveling(commands.Cog):
             await rankcard(ctx, user, False)
 
     @commands.command(
-        brief="Shows the rank card of a user", aliases=["r", "ranking", "rang"]
+        brief="Shows the rank card of a user", help="Users don't get XP for TimMcBot commands and to prevent spam, users can only gain XP once every minute.", aliases=["r", "ranking", "rang"]
     )
-    async def rank(self, ctx, *, user: discord.Member):
-        if user.bot:
+    async def rank(self, ctx, *, user: discord.User=None):
+        if user is None:
+            await rankcard(ctx, ctx.author, True)
+        elif user.bot:
             await ctx.send("This user is a bot and can't get ranked! :robot:")
         else:
             await rankcard(ctx, user, False)
-
-    @commands.Cog.listener()
-    @rank.error
-    async def rank_me(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await rankcard(ctx, ctx.message.author, True)
 
     @cog_ext.cog_slash(
         name="leaderboard",
@@ -232,7 +228,7 @@ class leveling(commands.Cog):
         mode = int(type)
         if mode == 3:
             await ctx.send(
-                f"Here is **{ctx.guild.name}**'s web leaderboard:\nhttps://timmcbot.tim135790.repl.co/leaderboard/?guild={ctx.guild.id}"
+                f"Here is **{ctx.guild.name}**'s web leaderboard:\nhttps://timmcbot.tim135790.repl.co/lb/?guild={ctx.guild.id}"
             )
         else:
             await levellist(self, ctx, mode=mode, slash=True)
@@ -240,6 +236,7 @@ class leveling(commands.Cog):
     @commands.group(
         brief="Shows the server's leaderboard",
         aliases=["leaderboard", "lb", "leaders", "ranklist", "rangliste"],
+        help="Users don't get XP for TimMcBot commands and to prevent spam, users can only gain XP once every minute.",
     )
     async def levels(self, ctx):
         if ctx.invoked_subcommand is None:
@@ -256,7 +253,7 @@ class leveling(commands.Cog):
     @levels.command(brief="Provides the link to the web leaderboard")
     async def web(self, ctx):
         await ctx.send(
-            f"Here is **{ctx.guild.name}**'s web leaderboard:\nhttps://timmcbot.tim135790.repl.co/leaderboard/?guild={ctx.guild.id}"
+            f"Here is **{ctx.guild.name}**'s web leaderboard:\nhttps://timmcbot.tim135790.repl.co/lb/?guild={ctx.guild.id}"
         )
 
     @commands.group(
@@ -463,19 +460,19 @@ async def levellist(self, ctx, *, mode, slash=False):
             self, ctx, tcropped, f"📖 Page {seite} of {seiten}", 0, symbol, mode
         )
         if random.randint(0, 5) == 0 and mode == 0:
-            message = await ctx.channel.send(
+            message = await ctx.send(
                 f"**Tip:** Enter `{prefix[1]}levels weekly` to see the weekly leaderboard. :bulb:",
                 embed=board,
             )
         elif random.randint(0, 5) == 1 and mode == 0:
-            message = await ctx.channel.send(
+            message = await ctx.send(
                 f"**Tip:** Enter `{prefix[1]}levels daily` to see the daily leaderboard. :bulb:",
                 embed=board,
             )
         else:
-            message = await ctx.channel.send(embed=board)
+            message = await ctx.send(embed=board)
         if slash is True:
-            await ctx.send("Here is the leaderboard!", hidden=True)
+            message = ctx.message
         await message.add_reaction("⏮"), await message.add_reaction(
             "◀"
         ), await message.add_reaction("▶"), await message.add_reaction("⏭")
@@ -483,7 +480,7 @@ async def levellist(self, ctx, *, mode, slash=False):
 
             def check(reaction, user):
                 return (
-                    reaction.message == message
+                    reaction.message.id == message.id
                     and str(reaction.emoji) in ["⏮", "◀", "▶", "⏭"]
                     and user.id == ctx.author.id
                 )
@@ -545,7 +542,7 @@ async def levelcard(self, ctx, tcropped, footer, low_rank, symbol, mode):
     if mode == 0:
         content = (
             content
-            + f":small_orange_diamond: [Click here](https://timmcbot.tim135790.repl.co/leaderboard/?guild={ctx.guild.id}) to visit the **web leaderbaord.**"
+            + f":small_orange_diamond: [Click here](https://timmcbot.tim135790.repl.co/lb/?guild={ctx.guild.id}) to visit the **web leaderbaord.**"
         )
     elif mode == 1:
         today = now = datetime.today()

@@ -89,7 +89,7 @@ description = "A Python wrapper for the Discord API"
 name = "discord.py"
 optional = false
 python-versions = ">=3.5.3"
-version = "1.6.0"
+version = "1.7.1"
 
 [package.dependencies]
 aiohttp = ">=3.6.0,<3.8.0"
@@ -234,6 +234,17 @@ socks = ["PySocks (>=1.5.6,<1.5.7 || >1.5.7)", "win-inet-pton"]
 
 [[package]]
 category = "main"
+description = "ScratchAPI is a Scratch API interface written in Python"
+name = "scratchapi"
+optional = false
+python-versions = "*"
+version = "1.4.1"
+
+[package.dependencies]
+requests = "*"
+
+[[package]]
+category = "main"
 description = "Python 2 and 3 compatibility utilities"
 name = "six"
 optional = false
@@ -273,7 +284,7 @@ idna = ">=2.0"
 multidict = ">=4.0"
 
 [metadata]
-content-hash = "938bd9909be582dcb9fc1e3c5e14170e49e24e84ca2d60117fa3d1686fc02c7a"
+content-hash = "16c8fdc9c71ec6ca51727b5a8cdb1c9f035badf8cf342cc43642d5a69ca8c721"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -340,8 +351,8 @@ discord = [
     {file = "discord-1.0.1.tar.gz", hash = "sha256:ff6653655e342e7721dfb3f10421345fd852c2a33f2cca912b1c39b3778a9429"},
 ]
 "discord.py" = [
-    {file = "discord.py-1.6.0-py3-none-any.whl", hash = "sha256:3df148daf6fbcc7ab5b11042368a3cd5f7b730b62f09fb5d3cbceff59bcfbb12"},
-    {file = "discord.py-1.6.0.tar.gz", hash = "sha256:ba8be99ff1b8c616f7b6dcb700460d0222b29d4c11048e74366954c465fdd05f"},
+    {file = "discord.py-1.7.1-py3-none-any.whl", hash = "sha256:399b80d576a63fa901300e80080568e1d9cd9c21260ca622fd7145c0009278fa"},
+    {file = "discord.py-1.7.1.tar.gz", hash = "sha256:82bc5e6325ab7557db9c466f638c98e18be03c330f56ad9bf4c18bdcf19faf55"},
 ]
 flask = [
     {file = "Flask-1.1.2-py2.py3-none-any.whl", hash = "sha256:8a4fdd8936eba2512e9c85df320a37e694c93945b33ef33c89946a340a238557"},
@@ -511,6 +522,10 @@ replit = [
 requests = [
     {file = "requests-2.15.1-py2.py3-none-any.whl", hash = "sha256:ff753b2196cd18b1bbeddc9dcd5c864056599f7a7d9a4fb5677e723efa2b7fb9"},
     {file = "requests-2.15.1.tar.gz", hash = "sha256:e5659b9315a0610505e050bb7190bf6fa2ccee1ac295f2b760ef9d8a03ebbb2e"},
+]
+scratchapi = [
+    {file = "scratchapi-1.4.1-py3-none-any.whl", hash = "sha256:c26d05b8426480345b4eec51a1c477276f5c885b325bbbc5ad41f72e4bd1d645"},
+    {file = "scratchapi-1.4.1.tar.gz", hash = "sha256:b89ff66fd0da5667994b01e1c6c26309ae30ace1b27f342233960115872bb359"},
 ]
 six = [
     {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},
