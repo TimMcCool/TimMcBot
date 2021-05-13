@@ -124,7 +124,7 @@ class fun(commands.Cog):
 
         def check(reaction, user):
             return (
-                reaction.message == message
+                reaction.message.id == message.id
                 and not user.bot
                 and str(reaction.emoji) == emojis["f_in_the_chat"]
             )
@@ -136,11 +136,11 @@ class fun(commands.Cog):
                 )
             except asyncio.TimeoutError:
                 if reactions == 0:
-                    await ctx.send(
+                    await message.reply(
                         "Time's up! :alarm_clock: **Nobody** paid their respects. :slight_frown:"
                     )
                 else:
-                    await ctx.send(
+                    await message.reply(
                         f"Time's up! :alarm_clock: The following people paid their respects: **{', '.join(reactors)}**"
                     )
                 return
@@ -173,20 +173,12 @@ class fun(commands.Cog):
         await ctx.send(await hardcore_spoiler(ctx, message))
 
     @commands.command(name="spoiler", aliases=["spoilered", "harcore-spoiler","hardcorespoiler"])
-    @commands.bot_has_permissions(manage_webhooks=True, manage_messages=True)
     async def hardcorespoiler(self, ctx, *, text):
         await ctx.message.delete()
         spoilered = await hardcore_spoiler(ctx, text)
         if spoilered is None:
             return
-        webhook = await ctx.channel.create_webhook(
-            name=ctx.channel.id,
-            reason="A slash command that requires a webhook was run",
-        )
-        await webhook.send(
-            spoilered, username=ctx.author.display_name, avatar_url=ctx.author.avatar_url
-        )
-        await webhook.delete()
+        await ctx.send(spoilered)
 
     @cog_ext.cog_slash(
         name="rickroll",
@@ -277,18 +269,10 @@ class fun(commands.Cog):
 
     @commands.command(brief="Emojifies your message")
     async def emojify(self, ctx, *, text):
-        await ctx.message.delete()
         emojified = await emojify(ctx, text)
         if emojified is None:
             return
-        webhook = await ctx.channel.create_webhook(
-            name=ctx.channel.id,
-            reason="A slash command that requires a webhook was run",
-        )
-        await webhook.send(
-            emojified, username=ctx.author.display_name, avatar_url=ctx.author.avatar_url
-        )
-        await webhook.delete()
+        await ctx.message.reply(emojified)
 
     @commands.command(name="8ball", aliases=["ask"])
     async def eightball(self, ctx, *, question=None):
@@ -319,14 +303,10 @@ class fun(commands.Cog):
             "I'm tired. :sleeping: Please ask me again later.",
         ]
         if "@everyone" in question or "@here" in question:
-            await ctx.send("STOP PINGING! :angry:")
-        elif "<@&" in question:
-            await ctx.send(
-                "Please try again, but without pinging roles this time. :ping_pong:"
-            )
+            await ctx.message.reply("**The magic 🎱 says:**\n> STOP PINGING! :angry:")
         else:
-            await ctx.send(
-                f"**Question:** {question} \n**Answer:** {random.choice(options)}"
+            await ctx.message.reply(
+                f"**The magic 🎱 says:**\n> {random.choice(options)}"
             )
 
 

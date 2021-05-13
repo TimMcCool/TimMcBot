@@ -12,6 +12,7 @@ pandas = "^1.2.3"
 replit = "^3.0.0"
 scratchapi = "^1.4.1"
 discord = "^1.0.1"
+emoji = "^1.2.0"
 
 [tool.poetry.dev-dependencies]
 

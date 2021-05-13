@@ -372,9 +372,9 @@ async def create_giveaway(self, ctx, data=None):
         content = content + f"\n❖ Required invited users: {data['invites']}"
 
     if not data["role"] is None:
-        content = content + f"\n\n**► Required role:**\n{role.mention}"
+        content = content + f"\n\n**» Required role:**\n{role.mention}"
     if not data["guild"] is None:
-        content = content + f"\n\n**► You have to be in:**\n{guild.name}"
+        content = content + f"\n\n**» You have to be in:**\n{guild.name}"
 
     content = content + "\n\n**React with 🎉 to enter!**"
     embed.description = content
@@ -453,12 +453,7 @@ class giveaways(commands.Cog):
                         member = await self.client.fetch_user(data["author"])
                         channel = await self.client.fetch_channel(data["channel"])
                         msg = await channel.fetch_message(int(gaw))
-                        try:
-                            if str(msg.embeds[0].author.name) == "🎊 Ended Giveaway" and reroll is False:
-                                print("UH OH!!! another giveaway error occurred.")
-                                continue
-                        except Exception:
-                            pass
+                        potwinners = []
                         try:
                             await msg.remove_reaction("🎉", self.client.user)
                         except Exception:
@@ -505,7 +500,10 @@ class giveaways(commands.Cog):
                             color=discord.Colour.random(),
                             timestamp=ends,
                         )
-                        embed.set_author(name="🎊 Ended Giveaway", icon_url=member.avatar_url)
+                        if reroll is True:
+                            embed.set_author(name="🔄 Rerolled Giveaway", icon_url=member.avatar_url)
+                        else:
+                            embed.set_author(name="🎊 Ended Giveaway", icon_url=member.avatar_url)
                         embed.set_footer(text="Ended at")
                         try:
                             await msg.edit(content=None, embed=embed)

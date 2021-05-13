@@ -258,7 +258,7 @@ class leveling(commands.Cog):
 
     @commands.group(
         brief="Shows the rank role settings",
-        aliases=["rankrole", "levelroles", "lbroles"],
+        aliases=["rankrole"],
     )
     async def rankroles(self, ctx):
         if ctx.invoked_subcommand is None:

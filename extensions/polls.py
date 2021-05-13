@@ -6,16 +6,17 @@ from main import assets, emojis, get_prefix, is_not_private, get_client_color
 import json
 from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option, create_choice
+from emoji import UNICODE_EMOJI
 
 # cogs
 
 
 def get_poll_answer_options():
     options = [
-        dict(name="question", description="Question", type=3, required="true"),
+        dict(name="question", description="What do you want to ask?", type=3, required="true"),
         dict(
             name="type",
-            description="'normal' is recommended",
+            description="What kind of poll do you want to create?",
             type=3,
             required="true",
             choices=[
@@ -31,7 +32,7 @@ def get_poll_answer_options():
         options.append(
             dict(
                 name=f"choice_{alphabet[i]}",
-                description=f"Answer option {alphabet[i]}",
+                description=f"Answer option {alphabet[i]}",#" - Putting an emoji at the beginning will change the bot reaction",
                 type=3,
                 required="false",
             )
@@ -119,8 +120,11 @@ class polls(commands.Cog):
         options=get_poll_answer_options(),
     )
     @commands.check(is_not_private)
-    async def _poll_create(self, ctx, question, type, *choices):
+    async def _poll_create(self, ctx, question, type: commands.clean_content, **choices: commands.clean_content):
         await ctx.defer(hidden=True)
+        question = discord.utils.escape_mentions(question)
+        for key in choices:
+            choices[key] = discord.utils.escape_mentions(choices[key])
         anonymous = False
         strict = False
         type = int(type)
@@ -128,7 +132,7 @@ class polls(commands.Cog):
             anonymous = True
         if type == 2 or type == 3:
             strict = True
-        await poll_create(self, ctx, question, choices, anonymous, strict, slash=True)
+        await poll_create(self, ctx, question, list(choices.values()), anonymous, strict, slash=True)
 
     @cog_ext.cog_subcommand(
         base="poll",
@@ -153,8 +157,8 @@ class polls(commands.Cog):
         usage='**Yes/No polls:**\n```{0}poll "Do you like the color blue?"```\n**Multiple answer options (up to 19):**\n```{0}poll "What is your favorite color?" "Blue" "Green" "Yellow"```',
     )
     @commands.bot_has_permissions(manage_messages=True)
-    @commands.cooldown(3, 15, commands.BucketType.user)
-    async def poll(self, ctx, question, *choices):
+    @commands.cooldown(3, 5, commands.BucketType.user)
+    async def poll(self, ctx, question: commands.clean_content, *choices: commands.clean_content):
         await ctx.message.delete()
         await poll_create(self, ctx, question, choices, False, False)
 
@@ -165,8 +169,8 @@ class polls(commands.Cog):
         usage='**Yes/No polls:**\n```{0}anonymouspoll "Do you like anonymous polls?"```\n**Multiple answer options (up to 19):**\n```{0}anonymouspoll "What is your least favorite color?" "Blue" "Green" "Yellow"```',
     )
     @commands.bot_has_permissions(manage_messages=True)
-    @commands.cooldown(3, 15, commands.BucketType.user)
-    async def anonymouspoll(self, ctx, question, *choices):
+    @commands.cooldown(3, 5, commands.BucketType.user)
+    async def anonymouspoll(self, ctx, question: commands.clean_content, *choices: commands.clean_content):
         await ctx.message.delete()
         await poll_create(self, ctx, question, choices, True, False)
 
@@ -177,8 +181,8 @@ class polls(commands.Cog):
         usage='**Yes/No polls:**\n```{0}strictpoll "Do you like strict polls?"```\n**Multiple answer options (up to 19):**\n```{0}strictpoll "What color do you like most?" "Blue" "Green" "Yellow"```',
     )
     @commands.bot_has_permissions(manage_messages=True)
-    @commands.cooldown(3, 15, commands.BucketType.user)
-    async def strictpoll(self, ctx, question, *choices):
+    @commands.cooldown(3, 5, commands.BucketType.user)
+    async def strictpoll(self, ctx, question: commands.clean_content, *choices: commands.clean_content):
         await ctx.message.delete()
         await poll_create(self, ctx, question, choices, False, True)
 
@@ -195,11 +199,14 @@ class polls(commands.Cog):
             title="Polls", description="", color=discord.Color.random()
         )
         if str(ctx.guild.id) in running_polls:
-            embed.set_footer(text="Click on a poll to jump directly to it!")
+            embed.set_footer(text="👁️ Only the most recent polls are shown\n🖱️ Click on a poll to jump to it")
             data = running_polls[str(ctx.guild.id)]
             running = ""
             stopped = ""
-            for poll in data:
+            keys = list(data.keys())
+            keys.reverse()
+            keys = keys[:6]
+            for poll in keys:
                 if data[poll]["ended"] is False:
                     running += f"[❖ {data[poll]['name']}]({data[poll]['url']})\n"
                 else:
@@ -309,7 +316,7 @@ async def poll_results(self, ctx, poll_message_id=None, slash=False):
             if total_reacts <= 0:
                 embed.set_author(name="📊 Poll results")
                 embed.description = (
-                    f"There are no results to show because noone has voted yet!"
+                    f"There are no results to show because noone has voted yet!\n[Click here]({data[poll_message_id]['url']}) to jump to the poll."
                 )
                 await ctx.send(embed=embed)
                 return
@@ -362,6 +369,7 @@ async def poll_results(self, ctx, poll_message_id=None, slash=False):
 async def poll_create(self, ctx, question, options, anonymous, strict, *, slash=False):
     options = list(options)
     options = options[:19]
+
     if len(options) == 0:
         embed = discord.Embed(title=question, color=discord.Color.random())
         if strict is True:

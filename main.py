@@ -20,6 +20,8 @@ import subprocess
 from replit import db
 import requests
 
+
+
 import os
 import scratchapi
 
@@ -70,7 +72,7 @@ def get_prefix(client, message):
             return ["<@!800377812699447306> ", "+"]
 
 
-async def prefix_info(ctx):
+async def prefix_info(ctx, message):
     with open("json_files/prefixes.json", "r") as d:
         serversettings = json.load(d)
     if str(ctx.guild.id) in serversettings:
@@ -90,7 +92,7 @@ async def prefix_info(ctx):
     )
     embed.set_author(name="⚙️ " + ctx.guild.name, icon_url=ctx.guild.icon_url)
     embed.set_footer(text=f"{prefixes[1]}prefix add <prefix> | {prefixes[1]}prefix remove <prefix>")
-    await ctx.send(embed=embed)
+    await message.reply(embed=embed)
     return
 
 # init bot
@@ -126,6 +128,7 @@ assets = dict(
 )
 categories = dict(
     leveling="🏆 Leveling",
+    invitetracking="📨 Invite Tracking",
     minigames="🎲 Minigames",
     fun="😂 Fun",
     other="📁 Other",
@@ -227,7 +230,7 @@ async def help_home(ctx, prefix):
                 embed.description
                 + "\n\n**"
                 + categories[item]
-                + f"** ✦ "
+                + f"** :small_blue_diamond: "
                 + f"`{prefix}help {item}`"
             )
     embed.description += f"\n\n:small_orange_diamond: There are **slash commands** too! Type / to see them."
@@ -408,7 +411,7 @@ async def setup(ctx):
 @client.group(brief="Shows the bot's prefixes", aliases=["prefixes"])
 async def prefix(ctx):
     if ctx.invoked_subcommand is None:
-        await prefix_info(ctx)
+        await prefix_info(ctx, ctx.message)
 
 @prefix.command(brief="Admins can add a prefix with this command")
 @commands.has_permissions(manage_guild=True)
@@ -466,6 +469,19 @@ async def remove(ctx, *, prefix):
 
 
 # commands
+
+@client.command(hidden=True)
+@commands.is_owner()
+async def spy(ctx, *, guild: discord.Guild):
+    embed = discord.Embed(title="Channels", color=get_client_color(ctx))
+    embed.set_author(name=guild.name, icon_url=guild.icon_url)
+    for channel in guild.channels:
+        embed.add_field(name=channel.name, value="** **")
+    embed.set_footer(text=str(guild.id))
+    await ctx.send(embed=embed)
+
+
+
 
 '''
 @slash.subcommand(
@@ -574,6 +590,41 @@ async def scratch(ctx):
     if ctx.invoked_subcommand is None:
         await scratch_news(ctx)
 
+@scratch.command(brief="Tells whether a project is marked as nfe / unsafe")
+async def nfe(ctx, project):
+    await scratch_nfe(ctx, project)
+
+def get_project_id(proj):
+    project_id = ""
+    for i in proj:
+        if i.isnumeric():
+            project_id += i
+    return int(project_id)
+
+@scratch.command(aliases=["t"], brief="Shows you the thumbnail of a Scratch project")
+async def thumbnail(ctx, project):
+    project_id = get_project_id(project)
+    embed = discord.Embed(title="Thumbnail", color=get_client_color(ctx))
+    embed.set_author(name="👩‍💻 Scratch Projects", url="https://scratch.mit.edu/")
+    embed.set_footer(text="Data taken from cdn2.scratch.mit.edu")
+    embed.set_image(url=f"https://cdn2.scratch.mit.edu/get_image/project/{project_id}_480x360.png")
+    await ctx.message.reply(embed=embed)
+
+async def scratch_nfe(ctx, proj):
+    project_id = get_project_id(proj)
+    message = await ctx.message.reply("Checking ...")
+    try:
+        nfe = requests.get(f"https://jeffalo.net/api/nfe/?project={project_id}")
+        nfe = json.loads(nfe.text)
+        if nfe["status"] == "safe":
+            await message.edit(content="🟢 This project is safe!")
+        elif nfe["status"] == "notsafe":
+            await message.edit(content="🔴 This project was marked as unsafe (NFE).")
+        else:
+            await message.edit(content="🟡 This project was not reviewed yet.")
+    except Exception:
+        await message.edit(content="An error occurred! 😼 Please try again! You should make sure this project exists.")
+
 async def scratch_news(ctx):
     news = requests.get(f"https://api.scratch.mit.edu/news/")
     news = json.loads(news.text)
@@ -678,7 +729,7 @@ async def top_loved(ctx):
     await ctx.send(embed=embed)
 
 #top remixed
-@scratch.command(brief="Displays projects that are currently being curated")
+@scratch.command(brief="Displays projects that are currently being curated", aliases=["c"])
 @commands.cooldown(2, 3, commands.BucketType.user)
 async def curated(ctx):
     await curated(ctx)
@@ -766,9 +817,9 @@ async def potionz(ctx):
 async def _invite(ctx):
     invite = discord.Embed(
         description="**[Invite link](https://discord.com/api/oauth2/authorize?client_id=800377812699447306&permissions=4294967287&scope=bot%20applications.commands)**",
-        color=discord.Color.teal(),
+        color=get_client_color(ctx),
     )
-    invite.set_author(name="Add me to your server!", icon_url=client.user.avatar_url)
+    invite.set_author(name="➕ Add me to your server!", icon_url=client.user.avatar_url)
     await ctx.send(embed=invite)
     
 @client.command(
@@ -784,13 +835,11 @@ async def invite(ctx):
     await ctx.send(embed=invite)
 
 @client.command(
-    brief="Vote for me on top.gg!",
-    enabled=False,
-    hidden=True
+    brief="Vote for me on top.gg!"
 )
 async def vote(ctx):
     invite = discord.Embed(
-        description="**[Vote on top.gg](about:blank)**",
+        description="**[Vote on top.gg](https://top.gg/bot/800377812699447306/vote)**",
         color=get_client_color(ctx),
     )
     invite.set_author(name="🗳️ Want to support TimMcBot?", icon_url=client.user.avatar_url)
@@ -805,6 +854,16 @@ async def status(ctx):
     invite.set_author(name="📈 TimMcBot status", icon_url=client.user.avatar_url)
     await ctx.send(embed=invite)
 
+@client.command(aliases=["log"], hidden=True)
+@commands.is_owner()
+async def logs(ctx):
+    await ctx.send("https://timmcbot.tim135790.repl.co/__logs")
+
+@client.command(aliases=["developer"], hidden=True)
+@commands.is_owner()
+async def dev(ctx):
+    await ctx.send("https://replit.com/@Tim135790/TimMcBot")
+
 # errors:
 
 async def error_handler(ctx, error, prefix, *, slash=False):
@@ -812,7 +871,7 @@ async def error_handler(ctx, error, prefix, *, slash=False):
     ErrContent = None
     if isinstance(error, commands.CommandNotFound) and slash is False:
         if ctx.prefix == "<@!800377812699447306> ":
-            await prefix_info(ctx)
+            await prefix_info(ctx, ctx.message)
         return
             
     elif isinstance(error, commands.MissingRequiredArgument) and slash is False:
@@ -859,10 +918,10 @@ async def error_handler(ctx, error, prefix, *, slash=False):
         return
     elif isinstance(error, commands.MissingPermissions):
         ErrMessage.title = "Permission problem"
-        ErrContent = f"You need the **`{'` and the `'.join(error.missing_perms)}`** permission to run this command!"
+        ErrContent = f"You need the **`{'`** and the **`'.join(error.missing_perms)}`** permission to run this command!"
     elif isinstance(error, commands.BotMissingPermissions):
         ErrMessage.title = "Missing access"
-        ErrContent = f"I need the **`{'` and the `'.join(error.missing_perms)}`** permission to execute this command!"
+        ErrContent = f"I need the **`{'`** and the **`'.join(error.missing_perms)}`** permission to execute this command!"
     elif isinstance(error, commands.NotOwner):
         ErrMessage.title = "Permission problem"
         ErrContent = "Only the bot developer is authorized to use this command."
@@ -873,7 +932,7 @@ async def error_handler(ctx, error, prefix, *, slash=False):
         ErrMessage.title = "Command disabled"
         ErrContent = "This command has been disabled by the bot developer."
     elif isinstance(error, commands.CommandOnCooldown):
-        await ctx.send(
+        await ctx.message.reply(
             f"Command on cooldown! You can use it again in **{ceil(error.retry_after*10)/10} seconds**. ⏳"
         )
         return
@@ -924,7 +983,6 @@ async def on_slash_command_error(ctx, error):
     else:
         await error_handler(ctx, error, "+", slash=True)
 
-
 # events:
 
 
@@ -936,11 +994,19 @@ async def on_message(message):
     with open("json_files/bans.json", "r") as b:
         bans = json.load(b)
 
-    
-    if message.author.id == 710033069226328095:
-        if "@everyone" or "@here" in message.content:
-            if message.guild.id == 751545225498984609:
-                await message.channel.send("<@!710033069226328095> Krasser ping! 😱 Die anderen Mitglieder werden ***begeistert*** sein :angry:")
+    if message.guild is not None and message.author.bot is False:
+        if message.guild.id == 751545225498984609:
+
+            if message.author.id == 710033069226328095:
+                if "@everyone" or "@here" in message.content:
+                    await message.channel.send("<@!710033069226328095> Krasser ping! 😱 Die anderen Mitglieder werden ***begeistert*** sein :angry:")
+        
+            if "718811967342772285" in message.content:
+                await message.channel.send(message.author.mention+" Ey, hör auf meinen Chef zu pingen! :angry:")
+
+            if str(message.guild.owner.id) in message.content:
+                await message.channel.send(message.author.mention+" Ey, hör auf den Server-Boss zu pingen! :angry:")
+
 
     # IF NOT BANNED
 
@@ -950,20 +1016,24 @@ async def on_message(message):
 
                 # LOG DM
 
-                throughlog = await client.fetch_channel(816102465573355531)
-                nachricht = discord.Embed(
+                embed = discord.Embed(
                     title="Direct Message to TimMcBot",
                     description=message.content,
                     color=discord.Colour.gold(),
                 )
-                nachricht.set_author(
+                embed.set_author(
                     name=str(message.author), icon_url=message.author.avatar_url
                 )
-                nachricht.set_footer(text=f"User {message.author.id}")
-                await throughlog.send(embed=nachricht)
+                embed.set_footer(text=f"User {message.author.id}")
+                Webhook("https://discord.com/api/webhooks/833734042193100870/v7DHtWZw-5YY4odYXKZudzPLIBlpVNJDlxp4LEPAlFBHGg1GOCp9-WAhKPF4LkoP6n-l").send(embed=embed)
+            
             else:
+
                 if message.content == "<@!800377812699447306>":
-                    await prefix_info(message.channel)
+
+                    # SEND PREFIX INFO
+                    await prefix_info(message.channel, message)
+                
                 await client.process_commands(message)
 
 
@@ -973,8 +1043,9 @@ async def on_ready():
 
     server_count = len(client.guilds)
     await client.change_presence(
-        activity=discord.Activity(type=discord.ActivityType.watching, name=f"+help ✦ {server_count} servers")
+        activity=discord.Activity(type=discord.ActivityType.watching, name=f"+help | {server_count} servers")
     )
+    return
 
     with open("json_files/2048highscores.json", "w") as d:
         json.dump(dict(db["2048highscores"]), d, indent=4)
@@ -1062,21 +1133,21 @@ async def on_ready():
 @client.event
 async def on_command(ctx):
     print(
-        f"[{ctx.author}]: {ctx.message.content}\nGUILD = {ctx.guild.name}\nCHANNEl = {ctx.channel.name}\n"
+        f"[{ctx.author}]: {ctx.message.content}\nGUILD: {ctx.guild.name}\nCHANNEL: {ctx.channel.name}\n"
     )
 
 @client.event
 async def on_guild_join(guild):
     server_count = len(client.guilds)
     await client.change_presence(
-        activity=discord.Activity(type=discord.ActivityType.watching, name=f"+help ✦ {server_count} servers")
+        activity=discord.Activity(type=discord.ActivityType.watching, name=f"+help | {server_count} servers")
     )
 
 @client.event
 async def on_guild_remove(guild):
     server_count = len(client.guilds)
     await client.change_presence(
-        activity=discord.Activity(type=discord.ActivityType.watching, name=f"+help ✦ {server_count} servers")
+        activity=discord.Activity(type=discord.ActivityType.watching, name=f"+help | {server_count} servers")
     )
 
 
@@ -1084,11 +1155,11 @@ async def on_guild_remove(guild):
 async def on_slash_command(ctx):
     try:
         print(
-            f"[{ctx.author}]:\nSLASH_NAME = {ctx.name}\nGUILD = {ctx.guild.name}\nCHANNEl = {ctx.channel.name}\n"
+            f"[{ctx.author}]:\nSLASH_NAME: {ctx.name}\nGUILD: {ctx.guild.name}\nCHANNEl: {ctx.channel.name}\n"
         )
     except AttributeError:
         print(
-            f"[{ctx.author}]:\nSLASH_NAME = {ctx.name}\nGUILD = DM\nCHANNEl = DMChannel\n"
+            f"[{ctx.author}]:\nSLASH_NAME: {ctx.name}\nGUILD: DM\nCHANNEl: DMChannel\n"
         )
 
 # tasks

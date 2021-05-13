@@ -18,26 +18,42 @@ with open("json_files/rr.json", "r") as r:
 
 #functions
 
-async def lock(self, ctx, channel: discord.TextChannel=None):
+async def lock(self, ctx, channel, role):
     if channel is None:
         channel = ctx.channel
-
-    overwrite = channel.overwrites_for(channel.guild.default_role)
+    if role is None:
+        role = channel.guild.default_role
+    
+    if channel.overwrites_for(role).send_messages is False:
+       await ctx.send(f"🔐 Channel already locked!")
+       return
+    overwrite = channel.overwrites_for(role)
     overwrite.send_messages = False
-    await channel.set_permissions(channel.guild.default_role, overwrite=overwrite)
+    await channel.set_permissions(role, overwrite=overwrite)
 
     await channel.set_permissions(ctx.guild.self_role, send_messages=True)
-    await ctx.send(f"🔒 Locked down **{channel.mention}**!")
+    if role == channel.guild.default_role:
+        await ctx.send(f"🔒 Locked down **{channel.mention}**!")
+    else:
+        await ctx.send(f"🔒 Locked down **{channel.mention}** for **{role.name}**!")
 
-async def unlock(self, ctx, channel):
+async def unlock(self, ctx, channel, role):
     if channel is None:
         channel = ctx.channel
-        
-    overwrite = channel.overwrites_for(channel.guild.default_role)
-    overwrite.send_messages = None
-    await channel.set_permissions(channel.guild.default_role, overwrite=overwrite)
+    if role is None:
+        role = channel.guild.default_role
 
-    await ctx.send(f"🔓 Unlocked **{channel.mention}**!")
+    if channel.overwrites_for(role).send_messages is None or channel.overwrites_for(role).send_messages is True:
+       await ctx.send(f"🔓 Channel already unlocked!")
+       return
+    overwrite = channel.overwrites_for(role)
+    overwrite.send_messages = None
+    await channel.set_permissions(role, overwrite=overwrite)
+
+    if role == channel.guild.default_role:
+        await ctx.send(f"🔓 Unlocked **{channel.mention}**!")
+    else:
+        await ctx.send(f"🔓 Unlocked **{channel.mention}** for **{role.name}**!")
 
 async def get_invites(self, ctx, user):
     embed = discord.Embed(
@@ -133,17 +149,36 @@ class utility(commands.Cog):
                 description = "the channel to lock",
                 type = 7,
                 required = "false"
+            ),
+            dict(
+                name = "role",
+                description = "the role you want to lock the channel for",
+                type = 7,
+                required = "false"
             )
         ]
     )
     @commands.has_permissions(manage_channels=True)
-    async def _lock(self, ctx, channel: discord.TextChannel=None):
-        await lock(self, ctx, channel)
+    async def _lock(self, ctx, channel: discord.TextChannel=None, role: discord.Role=None):
+        await lock(self, ctx, channel, role)
 
-    @commands.command(brief="Locks a channel", description="Denies the **`Send messages`** permission for **`@everyone`**.\nDepending on the permission settings of the channel, some members still may be able to send messages.")
+    @commands.command(brief="Locks a channel for @everyone or a specific role", description="Denies the **`Send messages`** permission for **`@everyone`** or a specific role.\nDepending on the permission settings of the channel, some members still may be able to send messages.")
     @commands.has_permissions(manage_channels=True)
-    async def lock(self, ctx, channel: discord.TextChannel=None):
-        await lock(self, ctx, channel)
+    async def lock(self, ctx, channel: discord.TextChannel=None, *, role: discord.Role=None):
+        await lock(self, ctx, channel, role)
+
+    @commands.command(brief="Locks down all channels of a category for @everyone")
+    @commands.has_permissions(manage_channels=True)
+    async def lockdown(self, ctx, *, category: discord.CategoryChannel):
+        role = ctx.guild.default_role
+    
+        for channel in category.text_channels:
+            overwrite = channel.overwrites_for(role)
+            overwrite.send_messages = False
+            await channel.set_permissions(role, overwrite=overwrite)
+
+        await ctx.channel.set_permissions(ctx.guild.self_role, send_messages=True)
+        await ctx.send(f"🔒 Locked down the category **{category.mention}**!")
 
     @cog_ext.cog_slash(
         name="unlock",
@@ -154,18 +189,24 @@ class utility(commands.Cog):
                 description = "the channel to unlock",
                 type = 7,
                 required = "false"
+            ),
+            dict(
+                name = "role",
+                description = "the role you want to lock the channel for",
+                type = 7,
+                required = "false"
             )
         ]
     )
     @commands.has_permissions(manage_channels=True)
-    async def _unlock(self, ctx, channel: discord.TextChannel=None):
-        await unlock(self, ctx, channel)
+    async def _unlock(self, ctx, channel: discord.TextChannel=None, role: discord.Role=None):
+        await unlock(self, ctx, channel, role)
 
 
-    @commands.command(brief="Unlocks a channel", description="Gives **`@everyone`** the **`Send messages`** permission.\nDepending on the permission settings of the channel, some members still may not be able to send messages.")
+    @commands.command(brief="Unlocks a channel for @everyone or a specific role", description="Gives **`@everyone`** or a specific role the **`Send messages`** permission.\nDepending on the permission settings of the channel, some members still may not be able to send messages.")
     @commands.has_permissions(manage_channels=True)
-    async def unlock(self, ctx, channel: discord.TextChannel=None):
-        await unlock(self, ctx, channel)
+    async def unlock(self, ctx, channel: discord.TextChannel=None, *, role: discord.Role=None):
+        await unlock(self, ctx, channel, role)
 
     @cog_ext.cog_slash(
         name="invites",
@@ -183,7 +224,7 @@ class utility(commands.Cog):
         if user is None:
             user = ctx.author
         embed = await get_invites(self, ctx, user)
-        embed.set_author(name="🔗 " + str(user), icon_url=user.avatar_url)
+        embed.set_author(name="📨 " + str(user), icon_url=user.avatar_url)
         await ctx.send(embed=embed)
 
 
@@ -192,7 +233,7 @@ class utility(commands.Cog):
         if user is None:
             user = ctx.author
         embed = await get_invites(self, ctx, user)
-        embed.set_author(name="🔗 " + str(user), icon_url=user.avatar_url)
+        embed.set_author(name="📨 " + str(user), icon_url=user.avatar_url)
         await ctx.send(embed=embed)
 
     @cog_ext.cog_slash(
@@ -333,7 +374,7 @@ class utility(commands.Cog):
     )
     @commands.check(is_not_private)
     @commands.has_permissions(embed_links=True)
-    async def _embed(self, ctx, title=None, description=None, color=None, footer=None, footer_icon_url=None, author=None, author_icon_url=None, thumbnail_url=None, image_url=None):
+    async def _embed(self, ctx, title=None, description="** **", color=None, footer=None, footer_icon_url=None, author=None, author_icon_url=None, thumbnail_url=None, image_url=None):
         await ctx.defer(hidden=True)
         colors = [
             discord.Color.blue(),
@@ -359,7 +400,9 @@ class utility(commands.Cog):
             discord.Color.blurple()    
 
         ]
-        embed = discord.Embed(title=title, description=description)
+        embed = discord.Embed(description=description)
+        if not title is None:
+            embed.title = title
         if not color is None:
             embed.color = colors[int(color)]
         if not footer is None:
@@ -382,9 +425,9 @@ class utility(commands.Cog):
         await webhook.delete()
         await ctx.send(f":ok_hand: Your embed was sent successfully!", hidden=True)
 
-    @commands.command(aliases=["reactionroles","rr"], brief="Creates a reaction role. Everyone will be able to pick up the role", usage="**Example:**\n```{}reactionrole 🎮 @Gamers```would allow members to pick the @Gamers role by reacting with :video_game:\n", description="Creates a reaction role. Members will be able to get the role by reacting to a message TimMcBot sends.\nBeware that everyone will be able to pick up the role.")
+    @commands.command(aliases=["rr","reactionroles"], brief="Creates a reaction role. Everyone will be able to pick up the role", usage="**Example:**\n```{}reactionrole 🎮 @Gamers```would allow members to pick the @Gamers role by reacting with :video_game:\n", description="Creates a reaction role. Members will be able to get the role by reacting to a message TimMcBot sends.\nBeware that everyone will be able to pick up the role.")
     @commands.has_permissions(manage_guild=True, manage_roles=True)
-    async def reactionrole(self, ctx, emoji : str, *, role : discord.Role):
+    async def reactionrole(self, ctx, emoji : str, *, role : discord.Role):#, emoji2 :str=None, role2 :discord.Role=None, emoji3 :str=None, role3 :discord.Role=None):
         global rr
         if role.position > ctx.guild.get_member(self.client.user.id).top_role.position:
             embed=discord.Embed(title="Error", description="You can only choose roles that are below my highest role.", color=discord.Color.red())
@@ -393,8 +436,8 @@ class utility(commands.Cog):
         if ctx.author.top_role.position > role.position:
             perms = role.permissions
             if perms.administrator is True or perms.manage_channels is True or perms.manage_guild is True or perms.manage_messages is True or perms.manage_nicknames is True or perms.ban_members is True or perms.kick_members is True:
-                embed=discord.Embed(title="This role has dangerous permissions!", description="Do you still want to allow everyone to pick it?", color=discord.Color.gold())
-                embed.set_author(name="⚠️ Warning", icon_url=ctx.guild.icon_url)
+                embed=discord.Embed(title="Warning", description="This role has dangerous permissions!", color=discord.Color.gold())
+                embed.set_footer(text="Do you still want to allow everyone to pick it?")
                 reminder = await ctx.send(embed=embed)
                 await reminder.add_reaction("✅")
                 await reminder.add_reaction("❌")
@@ -425,7 +468,7 @@ class utility(commands.Cog):
                         await ctx.send("👌 ok, the reaction role won't be created then.")
                         return
 
-            embed=discord.Embed(title="Reaction role", description=f"{emoji} - {role.mention}", color=role.color)
+            embed=discord.Embed(title="Reaction role", description=f"{emoji} • {role.mention}", color=discord.Color.random())
             embed.set_footer(text="React to get the role!")
             message = await ctx.send(emojis['loading'])
             try:

@@ -1,7 +1,7 @@
 import discord
 import threading
 import flask
-from flask import Flask, render_template, request
+from flask import Flask, render_template, send_file, request
 from threading import Thread
 import random
 import json
