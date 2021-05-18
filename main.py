@@ -20,8 +20,6 @@ import subprocess
 from replit import db
 import requests
 
-
-
 import os
 import scratchapi
 
@@ -102,7 +100,7 @@ client = commands.Bot(
     allowed_mentions=discord.AllowedMentions(roles=False, users=True, everyone=False),
 )
 slash = SlashCommand(client, sync_commands=True)
-client.author_id = 718811967342772285
+client.owner_id = 807320710807552030
 client.remove_command("help")
 
 with open("json_files/bans.json", "r") as b:
@@ -471,7 +469,7 @@ async def remove(ctx, *, prefix):
 # commands
 
 @client.command(hidden=True)
-@commands.is_owner()
+#@commands.is_owner()
 async def spy(ctx, *, guild: discord.Guild):
     embed = discord.Embed(title="Channels", color=get_client_color(ctx))
     embed.set_author(name=guild.name, icon_url=guild.icon_url)
@@ -1040,12 +1038,12 @@ async def on_message(message):
 @client.event
 async def on_ready():
     print(f"\n{client.user.name} is now online!\n")
-
+    
     server_count = len(client.guilds)
     await client.change_presence(
         activity=discord.Activity(type=discord.ActivityType.watching, name=f"+help | {server_count} servers")
     )
-    return
+    
 
     with open("json_files/2048highscores.json", "w") as d:
         json.dump(dict(db["2048highscores"]), d, indent=4)
@@ -1099,6 +1097,7 @@ async def on_ready():
 
     save_data_on_db.start()
     
+
     '''
     guild = await client.fetch_guild(800008691289292821)
     async for entry in guild.audit_logs(limit=100):

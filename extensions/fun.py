@@ -29,6 +29,10 @@ class fun(commands.Cog):
     # commands
 
     @commands.command()
+    async def corona(self, ctx):
+        await ctx.message.reply("https://tenor.com/view/coronavirus-pandemic-virus-germs-gif-16660839")
+
+    @commands.command()
     @commands.bot_has_permissions(attach_files=True)
     @commands.cooldown(1, 2.7, commands.BucketType.user)
     async def blur(self, ctx, *, user: discord.User=None):

@@ -185,6 +185,31 @@
                 "average",
                 "Bad"
             ]
+        },
+        "842842671131262986": {
+            "name": "does this look good?",
+            "strict": true,
+            "url": "https://discord.com/channels/740155791834873877/835842284012044298/842842671131262986",
+            "author": 718811967342772285,
+            "ended": false,
+            "channel": 835842284012044298,
+            "options": [
+                "Yes",
+                "no",
+                "\ud83e\udd2e"
+            ]
+        },
+        "844199145982918666": {
+            "name": "re-promote Shivenisism?",
+            "strict": false,
+            "url": "https://discord.com/channels/740155791834873877/796389099909021777/844199145982918666",
+            "author": 807320710807552030,
+            "ended": false,
+            "channel": 796389099909021777,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
         }
     },
     "811073585740644352": {
