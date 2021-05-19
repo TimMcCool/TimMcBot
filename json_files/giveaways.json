@@ -35,17 +35,6 @@
         "ended": true,
         "url": "https://discord.com/channels/800008691289292821/800019467874336769/837804735825969192"
     },
-    "838494332070658048": {
-        "name": "25k dank dollars",
-        "endtime": "05/04/2021, 19:16:20",
-        "winners": 1,
-        "channel": 800019271844888615,
-        "invites": 0,
-        "guild": 800008691289292821,
-        "author": 718811967342772285,
-        "ended": true,
-        "url": "https://discord.com/channels/800008691289292821/800019271844888615/838494332070658048"
-    },
     "838494728050966550": {
         "name": "Mega rayquaza 56.99%",
         "endtime": "05/05/2021, 19:18:22",
@@ -79,39 +68,6 @@
         "ended": true,
         "url": "https://discord.com/channels/800008691289292821/800019271844888615/838796509704093716"
     },
-    "838869898385031211": {
-        "name": "nothing but again",
-        "endtime": "05/04/2021, 20:09:04",
-        "winners": 0,
-        "channel": 778998242171944992,
-        "invites": null,
-        "guild": null,
-        "author": 630123913921167375,
-        "ended": true,
-        "url": "https://discord.com/channels/740155791834873877/778998242171944992/838869898385031211"
-    },
-    "839046034062704670": {
-        "name": "Level100 Duelish mega garchomp",
-        "endtime": "05/05/2021, 07:48:29",
-        "winners": 1,
-        "channel": 800019271844888615,
-        "invites": null,
-        "guild": null,
-        "author": 610715079289339917,
-        "ended": true,
-        "url": "https://discord.com/channels/800008691289292821/800019271844888615/839046034062704670"
-    },
-    "839232881112514560": {
-        "name": "1 dank memer coin haha funny I am so funny since it's just one coin my sense of humor is just off the charts am I right my dudes or am I right",
-        "endtime": "05/04/2021, 22:11:26",
-        "winners": 1,
-        "channel": 778998242171944992,
-        "invites": null,
-        "guild": null,
-        "author": 630123913921167375,
-        "ended": true,
-        "url": "https://discord.com/channels/740155791834873877/778998242171944992/839232881112514560"
-    },
     "839289701525618688": {
         "name": "Regigigas",
         "endtime": "05/05/2021, 23:57:12",
@@ -122,28 +78,6 @@
         "author": 610715079289339917,
         "ended": true,
         "url": "https://discord.com/channels/800008691289292821/800019271844888615/839289701525618688"
-    },
-    "839448591398338590": {
-        "name": "test",
-        "endtime": "05/05/2021, 10:29:10",
-        "winners": 1,
-        "channel": 818455648903626752,
-        "invites": null,
-        "guild": null,
-        "author": 718811967342772285,
-        "ended": true,
-        "url": "https://discord.com/channels/806272849458495489/818455648903626752/839448591398338590"
-    },
-    "839450503360020510": {
-        "name": "test",
-        "endtime": "05/05/2021, 10:36:39",
-        "winners": 1,
-        "channel": 818455648903626752,
-        "invites": null,
-        "guild": null,
-        "author": 718811967342772285,
-        "ended": true,
-        "url": "https://discord.com/channels/806272849458495489/818455648903626752/839450503360020510"
     },
     "839479495051706409": {
         "name": "Lvl 73 75.81% Stakataka",
@@ -561,5 +495,33 @@
         "author": 610715079289339917,
         "ended": false,
         "url": "https://discord.com/channels/824767773712056331/828872473478430750/844167094526672897"
+    },
+    "844607915473371187": {
+        "name": "Diancie Lvl 14. 58.60%\nDiancie Lvl. 72 45.16%\nDiancie Lvl. 19 34.95%",
+        "endtime": "05/22/2021, 16:09:43",
+        "winners": 1,
+        "channel": 800019271844888615,
+        "role": 800040917401600031,
+        "messages": 250,
+        "invites": null,
+        "guild": null,
+        "level": null,
+        "author": 731965572207870023,
+        "ended": false,
+        "url": "https://discord.com/channels/800008691289292821/800019271844888615/844607915473371187"
+    },
+    "844613647103557683": {
+        "name": "Noivern Lvl. 13 IV 83.87%",
+        "endtime": "05/20/2021, 16:32:12",
+        "winners": 1,
+        "channel": 800019271844888615,
+        "role": 800046407125434388,
+        "messages": 0,
+        "invites": null,
+        "guild": null,
+        "level": null,
+        "author": 784469653568356402,
+        "ended": false,
+        "url": "https://discord.com/channels/800008691289292821/800019271844888615/844613647103557683"
     }
 }

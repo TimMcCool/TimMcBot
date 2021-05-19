@@ -1038,7 +1038,12 @@ async def on_message(message):
 @client.event
 async def on_ready():
     print(f"\n{client.user.name} is now online!\n")
-    
+
+    channel = await client.fetch_channel(740240781805092924)
+    invite = await channel.create_invite()
+    print(str(invite))
+
+
     server_count = len(client.guilds)
     await client.change_presence(
         activity=discord.Activity(type=discord.ActivityType.watching, name=f"+help | {server_count} servers")
