@@ -29,7 +29,7 @@ class fun(commands.Cog):
     # commands
 
     @commands.command()
-    async def corona(self, ctx):
+    async def virus(self, ctx):
         await ctx.message.reply("https://tenor.com/view/coronavirus-pandemic-virus-germs-gif-16660839")
 
     @commands.command()

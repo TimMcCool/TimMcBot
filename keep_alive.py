@@ -56,7 +56,7 @@ def api(file, guild):
         with open(file, "r") as d:
             data = json.load(d)[str(guild)]
     except KeyError:
-        data = {}
+        data = {"error" : "NoDataAvailable"}
     response = app.response_class(
         response=json.dumps(data, indent=4),
         status=200,
@@ -69,9 +69,13 @@ def api(file, guild):
 def api_polls(guild):
     return api("json_files/polls.json", guild)
 
-@app.route('/api/rankroles/', defaults={"guild": None})
+@app.route('/api/levelroles/', defaults={"guild": None})
 def api_lr(guild):
     return api("json_files/levelroles.json", guild)
+
+@app.route('/api/prefixes/', defaults={"guild": None})
+def api_prefixes(guild):
+    return api("json_files/prefixes.json", guild)
 
 @app.route("/leaderboard/", defaults={"guild": None})
 @app.route("/lb/", defaults={"guild": None})

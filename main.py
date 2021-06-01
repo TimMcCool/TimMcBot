@@ -99,8 +99,8 @@ client = commands.Bot(
     intents=discord.Intents.all(),
     allowed_mentions=discord.AllowedMentions(roles=False, users=True, everyone=False),
 )
-slash = SlashCommand(client, sync_commands=True)
-client.owner_id = 807320710807552030
+slash = SlashCommand(client, sync_commands=False)
+client.owner_id = 844628822414589982 
 client.remove_command("help")
 
 with open("json_files/bans.json", "r") as b:
@@ -231,7 +231,12 @@ async def help_home(ctx, prefix):
                 + f"** :small_blue_diamond: "
                 + f"`{prefix}help {item}`"
             )
-    embed.description += f"\n\n:small_orange_diamond: There are **slash commands** too! Type / to see them."
+    notes = [
+        "There are **slash commands** too! Type / to see them.",
+        "Do you like TimMcBot? [**Vote for it** on top.gg!](https://top.gg/bot/800377812699447306/vote)",
+        "Want to support TimMcBot? [**Vote** on discordbotlist.com!](https://discordbotlist.com/bots/timmcbot/upvote)",
+   ]
+    embed.description += "\n\n :small_orange_diamond: "+random.choice(notes)
     return embed
 
 
@@ -483,8 +488,8 @@ async def spy(ctx, *, guild: discord.Guild):
 
 '''
 @slash.subcommand(
-    guild_ids=[806272849458495489],
-    base="scratch",
+    guild_ids=[844842835495878697],
+    base="scratchapi",
     name="login",
     options=[
         dict(
@@ -547,26 +552,12 @@ async def scratch_login(ctx, username, password):
                 create_choice(
                     name="Curated projects",
                     value="4"
-                ),
-                create_choice(
-                    name="Profile",
-                    value="5"
-                ),
-                create_choice(
-                    name="Message count",
-                    value="6"
                 )
             ]
-        ),
-    dict(
-        name="scratcher",
-        description="This is required for 'Profile' and 'Message count'",
-        type=3,
-        required="false"
         )
     ]
 )
-async def _scratch(ctx, page, scratcher=None):
+async def _scratch(ctx, page):
     await ctx.defer()
     if int(page) == 0:
         await scratch_news(ctx)
@@ -578,10 +569,6 @@ async def _scratch(ctx, page, scratcher=None):
         await cloudgames(ctx)
     elif int(page) == 4:
         await curated(ctx)
-    elif int(page) == 5:
-        await profile(ctx, scratcher)
-    elif int(page) == 6:
-        await messages(ctx, scratcher)
 
 @client.group(aliases=["s"], brief="Displays info from scratch.mit.edu", description="Displays information from the Scratch website (scratch.mit.edu) on your server!")
 async def scratch(ctx):
@@ -837,7 +824,7 @@ async def invite(ctx):
 )
 async def vote(ctx):
     invite = discord.Embed(
-        description="**[Vote on top.gg](https://top.gg/bot/800377812699447306/vote)**",
+        description="**[Vote on top.gg](https://top.gg/bot/800377812699447306/vote)**\n**[Vote on discordbotlist.com](https://discordbotlist.com/bots/timmcbot)**",
         color=get_client_color(ctx),
     )
     invite.set_author(name="🗳️ Want to support TimMcBot?", icon_url=client.user.avatar_url)
@@ -855,12 +842,23 @@ async def status(ctx):
 @client.command(aliases=["log"], hidden=True)
 @commands.is_owner()
 async def logs(ctx):
-    await ctx.send("https://timmcbot.tim135790.repl.co/__logs")
+    await ctx.send("https://timmcbot.1tim.repl.co/__logs")
 
 @client.command(aliases=["developer"], hidden=True)
 @commands.is_owner()
 async def dev(ctx):
-    await ctx.send("https://replit.com/@Tim135790/TimMcBot")
+    await ctx.send("https://replit.com/@1tim/TimMcBot")
+
+@client.command()
+async def api(ctx):
+    embed = discord.Embed(title="API", description="Fetch **TimMcBot leaderboards, polls and more** with HTTP requests and use them in your application!")
+    embed.set_author(name="TimMcBot", icon_url=client.user.avatar_url)
+    embed.add_field(name="Get the TimMcBot leaderboard", value="```https://timmcbot.1tim.repl.co/api/lb/?guild=[GUILD_ID]```", inline=False)
+    embed.add_field(name="Get all polls of a guild", value="```https://timmcbot.1tim.repl.co/api/polls/?guild=[GUILD_ID]```", inline=False)
+    embed.add_field(name="Get the TimMcBot prefix that was set in the guild", value="```https://timmcbot.1tim.repl.co/api/prefixes/?guild=[GUILD_ID]```", inline=False)
+    embed.set_footer(text="⚠️ Warning: The API is currently in beta and not finished!\nMore endpoints will be added soon!")
+    await ctx.send(embed=embed)
+
 
 # errors:
 
@@ -1034,21 +1032,83 @@ async def on_message(message):
                 
                 await client.process_commands(message)
 
+bonk = []
+
+@client.event
+async def on_guild_emojis_update(guild, before, after):
+    global bonk
+    
+    if not guild.id == 800008691289292821:
+        return
+    
+
+    for emoji1 in list(after):
+        if not emoji1 in list(before):
+            emoji = await guild.fetch_emoji(emoji1.id)
+            print(emoji)
+            print(emoji.user)
+            if emoji.user.id == 479742278932496384 or emoji.user.id == 844628822414589982:
+                await emoji.edit(name="bluetiful_jigsaw", reason="BONK")
+                bonk.append(emoji)
+
+    for emoji in bonk:
+        print(emoji)
+        try:
+            await emoji.edit(name="bluetiful_jigsaw", reason="BONK")
+        except Exception:
+            continue
+
+'''
+@client.event
+async def on_guild_channel_update(before, after):
+    if before.guild.id == 800008691289292821:
+        if before.position != after.position:
+            log = await client.fetch_channel(800011713688240150)
+            await log.send("<@!731965572207870023> <@!844628822414589982> ⚠ **SOMEONE JUST MOVED A CHANNEL!** ⚠")
+'''
 
 @client.event
 async def on_ready():
     print(f"\n{client.user.name} is now online!\n")
 
-    channel = await client.fetch_channel(740240781805092924)
-    invite = await channel.create_invite()
-    print(str(invite))
 
+
+
+    '''
+    guild = await client.fetch_guild(800008691289292821)
+
+    audit = await guild.audit_logs(limit=100).flatten()
+    for item in audit:
+        try:
+            print(f"{item.user}: {item.action}")
+        except AttributeError:
+            print("no")
+
+    print(guild)
+
+    '''
+
+
+
+
+
+
+    #message = await client.user.fetch_message(845641086554472458)
+    #print(message)
+    #await message.delete()
+
+    #guild = await client.fetch_guild(844235357901553665)
+    #await guild.leave()
+
+    
+    #channel = await client.fetch_channel(810610920577040414)
+    #invite = await channel.create_invite()
+    #print(str(invite))
 
     server_count = len(client.guilds)
     await client.change_presence(
         activity=discord.Activity(type=discord.ActivityType.watching, name=f"+help | {server_count} servers")
     )
-    
 
     with open("json_files/2048highscores.json", "w") as d:
         json.dump(dict(db["2048highscores"]), d, indent=4)

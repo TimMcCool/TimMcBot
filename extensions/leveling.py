@@ -26,6 +26,7 @@ class leveling(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        
         prefixes = get_prefix(self.client, message)
 
         if str(message.channel.type) == "private":
@@ -56,11 +57,15 @@ class leveling(commands.Cog):
             }
             new = True
         # CREATE VARS
-        old_users = servers[str(message.guild.id)]
+
         data = servers[str(message.guild.id)][str(message.author.id)]
+        
+        '''
+        old_users = servers[str(message.guild.id)]
+        
 
         # GET OLD RANK
-
+        
         keys = list(old_users.keys())
         tbefore = []
         i = 0
@@ -77,17 +82,17 @@ class leveling(commands.Cog):
         old_t = [t]
 
         # UPDATE DATA
-
+        '''
         data["messages"] = data["messages"] + 1
         data["name"] = str(message.author)
         change_xp = (round(time.time())) - data[
             "last"
         ] > 60 and not message.content.startswith(tuple(prefixes))
         if change_xp:
-            old_level = getlevel(data["xp"])[0]
+            #old_level = getlevel(data["xp"])[0]
             new_xp = randint(14, 20)
             data["xp"] = data["xp"] + new_xp
-            new_level = getlevel(data["xp"])[0]
+            #new_level = getlevel(data["xp"])[0]
             #if old_level != new_level:
             #    await message.channel.send(
             #        f"GG {message.author.mention}, you just advanced to **Level {new_level}**! Keep it up! :partying_face:"
@@ -123,12 +128,14 @@ class leveling(commands.Cog):
                     ),
                 }
         # SAVE UPDATED DATA IN JSON
+        
 
         servers[str(message.guild.id)][str(message.author.id)] = data
         with open("json_files/leveling.json", "w") as d:
             json.dump(servers, d, indent=4)
         # UPDATE RANK ROLES
 
+        '''
         if change_xp:
             old_rank = getmyrank(str(message.author.id), old_t[0])
             if new is True:
@@ -172,6 +179,7 @@ class leveling(commands.Cog):
                                     pass
                             except Exception:
                                 pass
+        '''
 
     @cog_ext.cog_slash(
         name="rank",
@@ -253,11 +261,13 @@ class leveling(commands.Cog):
     @levels.command(brief="Provides the link to the web leaderboard")
     async def web(self, ctx):
         await ctx.send(
-            f"Here is **{ctx.guild.name}**'s web leaderboard:\nhttps://timmcbot.tim135790.repl.co/lb/?guild={ctx.guild.id}"
+            f"Here is **{ctx.guild.name}**'s web leaderboard:\nhttps://timmcbot.1tim.repl.co/lb/?guild={ctx.guild.id}"
         )
 
     @commands.group(
         brief="Shows the rank role settings",
+        enabled=False,
+        hidden=True,
         aliases=["rankrole"],
     )
     async def rankroles(self, ctx):
@@ -298,7 +308,7 @@ class leveling(commands.Cog):
             )
             await ctx.send(embed=embed)
 
-    @rankroles.command(brief="Sets a rank role")
+    @rankroles.command(brief="Sets a rank role", enabled=False,)
     @commands.has_permissions(manage_guild=True)
     async def set(self, ctx, rank: int, *, role: discord.Role):
         # try:
@@ -368,7 +378,7 @@ class leveling(commands.Cog):
             )
             await ctx.message.add_reaction(emojis["checkmark"])
 
-    @rankroles.command(brief="Removes the rank role for a rank")
+    @rankroles.command(brief="Removes the rank role for a rank", enabled=False,)
     @commands.has_permissions(manage_guild=True)
     async def remove(self, ctx, rank: int):
         with open("json_files/levelroles.json", "r") as d:

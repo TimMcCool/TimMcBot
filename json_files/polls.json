@@ -296,6 +296,18 @@
                 "Upvotes",
                 "Downvotes"
             ]
+        },
+        "848460015248998410": {
+            "name": "I",
+            "strict": false,
+            "url": "https://discord.com/channels/800008691289292821/818552129454211122/848460015248998410",
+            "author": 844628822414589982,
+            "ended": false,
+            "channel": 818552129454211122,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
         }
     },
     "806272849458495489": {
@@ -887,6 +899,61 @@
             "author": 718811967342772285,
             "ended": false,
             "channel": 816102465573355531,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        }
+    },
+    "844947248249176096": {
+        "845324237576470528": {
+            "name": "how",
+            "strict": false,
+            "url": "https://discord.com/channels/844947248249176096/845323964439068683/845324237576470528",
+            "author": 785812091004125184,
+            "ended": false,
+            "channel": 845323964439068683,
+            "options": [
+                "are",
+                "you?",
+                "nevim",
+                "dsds"
+            ]
+        },
+        "845328078753759252": {
+            "name": "Are sfsdfsf",
+            "strict": false,
+            "url": "https://discord.com/channels/844947248249176096/845323964439068683/845328078753759252",
+            "author": 785812091004125184,
+            "ended": false,
+            "channel": 845323964439068683,
+            "options": [
+                "nevim",
+                "nd"
+            ]
+        },
+        "845328240939106325": {
+            "name": "jsi dobrej?",
+            "strict": false,
+            "url": "https://discord.com/channels/844947248249176096/845323964439068683/845328240939106325",
+            "author": 785812091004125184,
+            "ended": false,
+            "channel": 845323964439068683,
+            "options": [
+                "ano",
+                "ne",
+                "nevim"
+            ]
+        }
+    },
+    "844842835495878697": {
+        "845772452411998248": {
+            "name": "test",
+            "strict": true,
+            "url": "https://discord.com/channels/844842835495878697/844873057176780800/845772452411998248",
+            "author": 844628822414589982,
+            "ended": true,
+            "channel": 844873057176780800,
             "options": [
                 "Upvotes",
                 "Downvotes"
