@@ -65,6 +65,17 @@ def api(file, guild):
     return response
 
 
+@app.route('/dev/guilds')
+def guilds():
+    with open("json_files/leveling.json", "r") as d:
+        data = list(json.load(d).keys())
+    response = app.response_class(
+        response=json.dumps(data, indent=4),
+        status=200,
+        mimetype='application/json'
+    )
+    return response    
+
 @app.route('/api/polls/', defaults={"guild": None})
 def api_polls(guild):
     return api("json_files/polls.json", guild)

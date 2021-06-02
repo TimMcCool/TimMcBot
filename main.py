@@ -851,11 +851,11 @@ async def dev(ctx):
 
 @client.command()
 async def api(ctx):
-    embed = discord.Embed(title="API", description="Fetch **TimMcBot leaderboards, polls and more** with HTTP requests and use them in your application!")
+    embed = discord.Embed(title="API", description="Fetch TimMcBot's data with HTTP requests and use them in your application!", color=get_client_color(ctx))
     embed.set_author(name="TimMcBot", icon_url=client.user.avatar_url)
-    embed.add_field(name="Get the TimMcBot leaderboard", value="```https://timmcbot.1tim.repl.co/api/lb/?guild=[GUILD_ID]```", inline=False)
-    embed.add_field(name="Get all polls of a guild", value="```https://timmcbot.1tim.repl.co/api/polls/?guild=[GUILD_ID]```", inline=False)
-    embed.add_field(name="Get the TimMcBot prefix that was set in the guild", value="```https://timmcbot.1tim.repl.co/api/prefixes/?guild=[GUILD_ID]```", inline=False)
+    embed.add_field(name="Get the TimMcBot leaderboard", value="```timmcbot.1tim.repl.co/api/lb/?guild=[GUILD_ID]```", inline=False)
+    embed.add_field(name="Get all polls of a guild", value="```timmcbot.1tim.repl.co/api/polls/?guild=[GUILD_ID]```", inline=False)
+    embed.add_field(name="Get the TimMcBot prefixes that were set in the guild", value="```timmcbot.1tim.repl.co/api/prefixes/?guild=[GUILD_ID]```", inline=False)
     embed.set_footer(text="⚠️ Warning: The API is currently in beta and not finished!\nMore endpoints will be added soon!")
     await ctx.send(embed=embed)
 
@@ -1228,7 +1228,7 @@ async def on_slash_command(ctx):
 
 # tasks
 
-@tasks.loop(seconds=20)
+@tasks.loop(seconds=5)
 async def save_data_on_db():
     with open("json_files/2048highscores.json", "r") as d:
         db["2048highscores"] = dict(json.load(d))

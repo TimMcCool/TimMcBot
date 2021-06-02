@@ -439,6 +439,10 @@ class giveaways(commands.Cog):
                         json.dump(gaws, g, indent=4)
                 if ends < datetime.now() and data["ended"] is False:
                     data["ended"] = True
+                    
+
+                    ####
+
                     try:
                         reroll = False
                         data.pop("role")
