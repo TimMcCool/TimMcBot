@@ -12,6 +12,7 @@ import os
 from datetime import datetime, timedelta
 import json
 import asyncio
+from discord_components import DiscordComponents, Button, ButtonStyle, InteractionType
 
 with open("json_files/rr.json", "r") as r:
     rr = json.load(r)
@@ -117,6 +118,15 @@ class utility(commands.Cog):
                 await ctx.send("This invite belongs to another server! 🧭")
         except Exception:
             await ctx.send("This invite link wasn't found! 👀")
+
+
+    @commands.command()
+    async def servericon(self, ctx):
+        try:
+            await ctx.send(str(ctx.guild.icon_url))
+        except Exception:
+            await ctx.send("This server has no icon :confused:")
+
 
     @commands.command(brief="Revokes an invite link")
     @commands.has_permissions(manage_guild=True)

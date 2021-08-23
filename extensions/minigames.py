@@ -398,7 +398,7 @@ class minigames(commands.Cog):
             await ingame(self, channel, players, board, turn, spiel, message)
 
     @commands.command(
-        enabled=False,
+        enabled=True,
         hidden=True,
         description="Play othello against a server member!",
         aliases=["reversi"],

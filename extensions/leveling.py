@@ -39,8 +39,8 @@ class leveling(commands.Cog):
 
         # LOAD JSON
 
-        with open("json_files/leveling.json", "r") as d:
-            servers = json.load(d)
+        from main import leveling
+        servers = leveling
         # ADD DATA THAT ISN'T IN DICT YET
 
         new = False
@@ -131,8 +131,9 @@ class leveling(commands.Cog):
         
 
         servers[str(message.guild.id)][str(message.author.id)] = data
-        with open("json_files/leveling.json", "w") as d:
-            json.dump(servers, d, indent=4)
+        leveling = servers
+
+
         # UPDATE RANK ROLES
 
         '''
@@ -236,7 +237,7 @@ class leveling(commands.Cog):
         mode = int(type)
         if mode == 3:
             await ctx.send(
-                f"Here is **{ctx.guild.name}**'s web leaderboard:\nhttps://timmcbot.tim135790.repl.co/lb/?guild={ctx.guild.id}"
+                f"Here is **{ctx.guild.name}**'s web leaderboard:\nhttps://timmcbot.1tim.repl.co/lb/?guild={ctx.guild.id}"
             )
         else:
             await levellist(self, ctx, mode=mode, slash=True)
@@ -308,97 +309,10 @@ class leveling(commands.Cog):
             )
             await ctx.send(embed=embed)
 
-    @rankroles.command(brief="Sets a rank role", enabled=False,)
-    @commands.has_permissions(manage_guild=True)
-    async def set(self, ctx, rank: int, *, role: discord.Role):
-        # try:
-        origin_role = role
-        origin_rank = rank
-        if role.managed is True:
-            await ctx.send(
-                embed=discord.Embed(
-                    title="Error",
-                    description="This role can't be used as rank role because it is **managed** by a bot or by an intergration.",
-                    color=discord.Color.red(),
-                )
-            )
-            await ctx.message.add_reaction("⚠")
-        else:
-            with open("json_files/levelroles.json", "r") as d:
-                levelroles = json.load(d)
-            if not str(ctx.guild.id) in levelroles:
-                levelroles[str(ctx.guild.id)] = {}
-            if not str(rank) in levelroles[str(ctx.guild.id)] and len(list(levelroles[str(ctx.guild.id)].keys())) >= 15:
-                await ctx.send("This server **reached the limit** of rank roles! (15) 🚫")
-                return
-            levelroles[str(ctx.guild.id)][str(rank)] = role.id
-            with open("json_files/levelroles.json", "w") as d:
-                json.dump(levelroles, d, indent=4)
-            with open("json_files/leveling.json", "r") as d:
-                users = json.load(d)[str(ctx.message.guild.id)]
-            with open("json_files/leveling.json", "r") as d:
-                users = json.load(d)[str(ctx.guild.id)]
-            keys = list(users.keys())
-            tbefore = []
-            for item in keys:
-                tbefore.append([users[item], item])
-
-            def check(elem):
-                return elem[0]["xp"]
-
-            t = sorted(tbefore, key=check, reverse=True)
-
-            roles = []
-            guild_lr = levelroles[str(ctx.guild.id)]
-            for index in guild_lr:
-                try:
-                    role = ctx.message.guild.get_role(guild_lr[str(index)])
-                    roles.append(role)
-                except Exception:
-                    continue
-                for member in role.members:
-                    try:
-                        await member.remove_roles(role)
-                    except Exception:
-                        pass
-            for rank in guild_lr:
-                try:
-                    role = ctx.message.guild.get_role(guild_lr[str(rank)])
-                    if not int(rank) > len(t):
-                        member = ctx.message.guild.get_member(int(t[int(rank) - 1][1]))
-                        await member.add_roles(role)
-                except Exception:
-                    pass
-            # except Exception:
-            """  await ctx.send(embed=discord.Embed(title="Error", description=f"**I can't manage that role because it is above my highest roles!** To fix that problem, go to the role settings of this server and drag the TimMcBot role above {role.mention}!", color=discord.Color.red()))
-        await ctx.message.add_reaction("⚠")
-      else:"""
-            await ctx.send(
-                f"**Success!** The role {origin_role.mention} will be automatically assigned to the member with rank **{origin_rank}.**"
-            )
-            await ctx.message.add_reaction(emojis["checkmark"])
-
-    @rankroles.command(brief="Removes the rank role for a rank", enabled=False,)
-    @commands.has_permissions(manage_guild=True)
-    async def remove(self, ctx, rank: int):
-        with open("json_files/levelroles.json", "r") as d:
-            levelroles = json.load(d)
-        if str(ctx.guild.id) in levelroles:
-            if str(rank) in levelroles[str(ctx.guild.id)]:
-                levelroles[str(ctx.guild.id)].pop(str(rank))
-                await ctx.send(
-                    f"**Success!** The rank role for rank **{rank}** has been removed."
-                )
-                await ctx.message.add_reaction(emojis["checkmark"])
-                if levelroles[str(ctx.guild.id)] == {}:
-                    levelroles.pop(str(ctx.guild.id))
-                with open("json_files/levelroles.json", "w") as d:
-                    json.dump(levelroles, d, indent=4)
-
 
 async def levellist(self, ctx, *, mode, slash=False):
-    with open("json_files/leveling.json", "r") as d:
-        servers = json.load(d)
+    from main import leveling
+    servers = leveling
     if not str(ctx.guild.id) in servers:
         await ctx.send("No messages have been sent since TimMcBot was added!")
         return
@@ -552,7 +466,7 @@ async def levelcard(self, ctx, tcropped, footer, low_rank, symbol, mode):
     if mode == 0:
         content = (
             content
-            + f":small_orange_diamond: [Click here](https://timmcbot.tim135790.repl.co/lb/?guild={ctx.guild.id}) to visit the **web leaderbaord.**"
+            + f":small_orange_diamond: [Click here](https://timmcbot.1tim.repl.co/lb/?guild={ctx.guild.id}) to visit the **web leaderboard.**"
         )
     elif mode == 1:
         today = now = datetime.today()
@@ -584,8 +498,8 @@ async def levelcard(self, ctx, tcropped, footer, low_rank, symbol, mode):
 
 
 async def rankcard(ctx, user, myself):
-    with open("json_files/leveling.json", "r") as d:
-        servers = json.load(d)
+    from main import leveling
+    servers = leveling
     if str(ctx.guild.id) in servers:
         users = servers[str(ctx.guild.id)]
         if str(user.id) in users:

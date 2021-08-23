@@ -310,7 +310,7 @@ class fun(commands.Cog):
             await ctx.message.reply("**The magic 🎱 says:**\n> STOP PINGING! :angry:")
         else:
             await ctx.message.reply(
-                f"**The magic 🎱 says:**\n> {random.choice(options)}"
+                f"The magic 🎱 says:\n> **{random.choice(options)}**"
             )
 
 

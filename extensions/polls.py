@@ -6,7 +6,6 @@ from main import assets, emojis, get_prefix, is_not_private, get_client_color
 import json
 from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option, create_choice
-from emoji import UNICODE_EMOJI
 
 # cogs
 

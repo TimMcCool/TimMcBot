@@ -28,6 +28,7 @@ questions = [
     "How many users do members need to have invited?",
     "Is there a server users need to be in?",
     "What TimMcBot level do members need?",
+    "Do you want to add a description to your giveaway?"
 ]
 
 descriptions = [
@@ -39,6 +40,7 @@ descriptions = [
     "",
     "",
     "Name it, reply with its id or send an invite link to the server.",
+    "",
     "",
 ]
 
@@ -53,7 +55,8 @@ contents = [
     "{}",
     "{}",
     "{}You almost made it!",
-    "{}Last question!",
+    "{}",
+    "{}Last question!"
 ]
 
 
@@ -68,6 +71,7 @@ async def create_giveaway(self, ctx, data=None):
         "invites",
         "guild",
         "level",
+        "note",
         "author",
     ]
 
@@ -363,20 +367,26 @@ async def create_giveaway(self, ctx, data=None):
     embed.set_author(name="🎉 Giveaway", icon_url=ctx.author.avatar_url)
     embed.set_footer(text="Ends at")
 
-    content = f"Hosted by {ctx.author.mention}\n❖ Winners: {data['winners']}"
+    content = f"Hosted by {ctx.author.mention}\n\n"
+
+    content+=f"➜ Winners:** {data['winners']}**\n"
     if not data["messages"] is None:
-        content = content + f"\n❖ Required messages: {data['messages']}"
+        content = content + f"➜ Required messages:** {data['messages']}**\n"
     if not data["level"] is None:
-        content = content + f"\n❖ Required TimMcBot level: {data['level']}"
+        content = content + f"➜ Required TimMcBot level:** {data['level']}**\n"
     if not data["invites"] is None:
-        content = content + f"\n❖ Required invited users: {data['invites']}"
+        content = content + f"➜ Required invited users:** {data['invites']}**\n"
 
     if not data["role"] is None:
-        content = content + f"\n\n**» Required role:**\n{role.mention}"
+        content = content + f"\n**:performing_arts: Required role:**\n{role.mention}\n"
     if not data["guild"] is None:
-        content = content + f"\n\n**» You have to be in:**\n{guild.name}"
+        content = content + f"\n**:desktop: You have to be in:**\n{guild.name}\n"
 
-    content = content + "\n\n**React with 🎉 to enter!**"
+    if not data["note"] is None:
+        content = content + f"\n**:pencil: Description:**```\n{data['note']}```"
+        data.pop("note")
+
+    content = content + "\n**React with 🎉 to enter!**"
     embed.description = content
 
     data["author"] = ctx.author.id
@@ -613,16 +623,7 @@ class giveaways(commands.Cog):
         required_invites = invites
         required_server = server
         required_level = level
-        keys = [
-            "name",
-            "endtime",
-            "winners",
-            "channel",
-            "role",
-            "messages",
-            "level",
-            "author",
-        ]
+
 
         await ctx.defer()
 
@@ -746,6 +747,7 @@ class giveaways(commands.Cog):
         data["level"] = required_level
 
         data["author"] = ctx.author.id
+        data["note"] = None
 
         await create_giveaway(self, ctx, data)
 

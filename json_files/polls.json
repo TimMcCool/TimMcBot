@@ -210,6 +210,92 @@
                 "Upvotes",
                 "Downvotes"
             ]
+        },
+        "851798783528271902": {
+            "name": "What looks better?",
+            "strict": false,
+            "url": "https://discord.com/channels/740155791834873877/748976910515830855/851798783528271902",
+            "author": 844628822414589982,
+            "ended": false,
+            "channel": 748976910515830855,
+            "options": [
+                "Style A",
+                "Style B"
+            ]
+        },
+        "864834322645516308": {
+            "name": "test",
+            "strict": false,
+            "url": "https://discord.com/channels/740155791834873877/819234505628975166/864834322645516308",
+            "author": 844628822414589982,
+            "ended": false,
+            "channel": 819234505628975166,
+            "options": [
+                "1",
+                "2",
+                "3"
+            ]
+        },
+        "864835099677163550": {
+            "name": "1",
+            "strict": false,
+            "url": "https://discord.com/channels/740155791834873877/819234505628975166/864835099677163550",
+            "author": 656420329651961856,
+            "ended": true,
+            "channel": 819234505628975166,
+            "options": [
+                "2",
+                "3"
+            ]
+        },
+        "864835782506577920": {
+            "name": "frick",
+            "strict": false,
+            "url": "https://discord.com/channels/740155791834873877/819234505628975166/864835782506577920",
+            "author": 804627122358452244,
+            "ended": false,
+            "channel": 819234505628975166,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "879076123814817843": {
+            "name": "revive this server, create a new server or do nothing?",
+            "strict": false,
+            "url": "https://discord.com/channels/740155791834873877/799376887247667210/879076123814817843",
+            "author": 844628822414589982,
+            "ended": false,
+            "channel": 799376887247667210,
+            "options": [
+                "revive this server",
+                "create new server",
+                "do nothing"
+            ]
+        },
+        "879077326070120459": {
+            "name": "do u care about usk age ratings",
+            "strict": true,
+            "url": "https://discord.com/channels/740155791834873877/799376887247667210/879077326070120459",
+            "author": 844628822414589982,
+            "ended": true,
+            "channel": 799376887247667210,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "879461278282817557": {
+            "name": "delete channel?",
+            "strict": false,
+            "url": "https://discord.com/channels/740155791834873877/800322360246796299/879461278282817557",
+            "author": 844628822414589982,
+            "ended": false,
+            "channel": 800322360246796299,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
         }
     },
     "811073585740644352": {
@@ -957,6 +1043,186 @@
             "options": [
                 "Upvotes",
                 "Downvotes"
+            ]
+        }
+    },
+    "844124863231950848": {
+        "849946872482234388": {
+            "name": "who is hotter",
+            "strict": false,
+            "url": "https://discord.com/channels/844124863231950848/844124863231950851/849946872482234388",
+            "author": 844628822414589982,
+            "ended": false,
+            "channel": 844124863231950851,
+            "options": [
+                "<:griffbee:845443136721256462>",
+                "<:jailed_cfg:847955585672413274>"
+            ]
+        },
+        "864835811610329098": {
+            "name": "frick",
+            "strict": false,
+            "url": "https://discord.com/channels/844124863231950848/859257635089547354/864835811610329098",
+            "author": 804627122358452244,
+            "ended": false,
+            "channel": 859257635089547354,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "864838233526108170": {
+            "name": "ok",
+            "strict": false,
+            "url": "https://discord.com/channels/844124863231950848/859257635089547354/864838233526108170",
+            "author": 804627122358452244,
+            "ended": false,
+            "channel": 859257635089547354,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "866795236336730172": {
+            "name": "setup community server?",
+            "strict": false,
+            "url": "https://discord.com/channels/844124863231950848/844124863231950851/866795236336730172",
+            "author": 844628822414589982,
+            "ended": false,
+            "channel": 844124863231950851,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "866810223535456297": {
+            "name": "Add checkpoints?",
+            "strict": false,
+            "url": "https://discord.com/channels/844124863231950848/844124863231950851/866810223535456297",
+            "author": 707388753576198265,
+            "ended": false,
+            "channel": 844124863231950851,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "868092179623608320": {
+            "name": "should I boost this server?",
+            "strict": false,
+            "url": "https://discord.com/channels/844124863231950848/844124863231950851/868092179623608320",
+            "author": 844628822414589982,
+            "ended": false,
+            "channel": 844124863231950851,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        }
+    },
+    "790477442195652608": {
+        "851052649206120449": {
+            "name": "Should I ping new members when I post something important in <#790477442686124124> ?",
+            "strict": false,
+            "url": "https://discord.com/channels/790477442195652608/820838301749346304/851052649206120449",
+            "author": 656420329651961856,
+            "ended": false,
+            "channel": 820838301749346304,
+            "options": [
+                "Yes",
+                "No",
+                "Why not?",
+                "Of course no! I don't want so much pings ):",
+                "Idk so don't ask me hehe"
+            ]
+        },
+        "851414278081609738": {
+            "name": "test",
+            "strict": false,
+            "url": "https://discord.com/channels/790477442195652608/820838301749346304/851414278081609738",
+            "author": 656420329651961856,
+            "ended": true,
+            "channel": 820838301749346304,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "851722225902944296": {
+            "name": "check",
+            "strict": false,
+            "url": "https://discord.com/channels/790477442195652608/820838301749346304/851722225902944296",
+            "author": 656420329651961856,
+            "ended": false,
+            "channel": 820838301749346304,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "864835291393818655": {
+            "name": "Should",
+            "strict": true,
+            "url": "https://discord.com/channels/790477442195652608/820838301749346304/864835291393818655",
+            "author": 656420329651961856,
+            "ended": true,
+            "channel": 820838301749346304,
+            "options": [
+                "I",
+                "add",
+                "gyms?",
+                "Yes,all!",
+                "No.",
+                "Yes,butnotallofthem"
+            ]
+        },
+        "865158416410345492": {
+            "name": "Should I add gyms? (Poketwo)",
+            "strict": true,
+            "url": "https://discord.com/channels/790477442195652608/820838301749346304/865158416410345492",
+            "author": 656420329651961856,
+            "ended": false,
+            "channel": 820838301749346304,
+            "options": [
+                "Yes! All of the gyms!!",
+                "No.",
+                "Yes, but not all of the gyms."
+            ]
+        },
+        "865158854344704021": {
+            "name": "Another option..",
+            "strict": true,
+            "url": "https://discord.com/channels/790477442195652608/820838301749346304/865158854344704021",
+            "author": 656420329651961856,
+            "ended": false,
+            "channel": 820838301749346304,
+            "options": [
+                "Yes, but only 1 channel for all the gyms"
+            ]
+        }
+    },
+    "854381487390195732": {
+        "854382991723331614": {
+            "name": "delete this server",
+            "strict": false,
+            "url": "https://discord.com/channels/854381487390195732/854381487390195735/854382991723331614",
+            "author": 844628822414589982,
+            "ended": false,
+            "channel": 854381487390195735,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "854394363190837308": {
+            "name": "KICK",
+            "strict": false,
+            "url": "https://discord.com/channels/854381487390195732/854381487390195735/854394363190837308",
+            "author": 674671960369922068,
+            "ended": true,
+            "channel": 854381487390195735,
+            "options": [
+                "BOTS?"
             ]
         }
     }

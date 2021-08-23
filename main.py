@@ -21,16 +21,17 @@ from replit import db
 import requests
 
 import os
-import scratchapi
 
-def install(name):
-    subprocess.call(["pip", "install", name])
 
 try:
     import discord_slash
+    from discord_components import DiscordComponents, Button, ButtonStyle, InteractionType
+
 except ModuleNotFoundError:
-    install("discord-py-slash-command")
-    import discord_slash
+
+    subprocess.call(["pip", "install", "discord-py-slash-command==2.0.0"])
+    subprocess.call(["pip", "install", "discord-components==0.5.2.4"])
+
 from discord_slash import SlashCommand, SlashContext
 from discord_slash.utils.manage_commands import create_option, create_choice
 
@@ -99,26 +100,27 @@ client = commands.Bot(
     intents=discord.Intents.all(),
     allowed_mentions=discord.AllowedMentions(roles=False, users=True, everyone=False),
 )
-slash = SlashCommand(client, sync_commands=False)
+slash = SlashCommand(client, sync_commands=True)
 client.owner_id = 844628822414589982 
 client.remove_command("help")
 
 with open("json_files/bans.json", "r") as b:
     bans = json.load(b)
 
+invite_link = "https://discord.com/api/oauth2/authorize?client_id=853970415080439828&permissions=806112496&scope=bot%20applications.commands"
 emojis = dict(
-    spacer="<:spacer:815004931878158376>",
-    blobchain="<a:blobchain_1:808675562159341568>",
+    spacer="<:spacer:854038785606942745>", #
+    blobchain="<a:blobchain:789959677856317450>",
     ban="<:ban_1:808677659805483079>",
     # checkmark = "<a:checkmark_1:808767689375612959>",
     checkmark="👌",
     coin="XP",
     diamond=":diamond_shape_with_a_dot_inside:",
     bluespacer="<:bluespacer:818086140649144330>",
-    f_in_the_chat="<:f_in_the_chat:822516052151107644>",
+    f_in_the_chat="<:F_in_the_chat:796449160383561759>",
     tmb_icon="<:TimMcBot:822934684803268648>",
     info="<:info:823643485813866518>",
-    loading="<a:loading:830584070706429963>"
+    loading="<a:loading:854449780084178984>"
 )
 assets = dict(
     tmc_server_animated="https://cdn.discordapp.com/attachments/818455648903626752/820791308032671764/ezgif-6-0fe2bac545b1.gif",
@@ -148,23 +150,8 @@ for filename in os.listdir("./extensions"):
     description="Don't know what to do? This shows you the help message.",
     options=[
         dict(
-            name="category",
-            description="If you want to get info on a certain category, select it now!",
-            type=3,
-            required="false",
-            choices=[
-                create_choice(name="Leveling", value="leveling"),
-                create_choice(name="Minigames", value="minigames"),
-                create_choice(name="Giveaways", value="giveaways"),
-                create_choice(name="Fun", value="fun"),
-                create_choice(name="Polls", value="polls"),
-                create_choice(name="Utility", value="utility"),
-                create_choice(name="Other", value="other"),
-            ],
-        ),
-        dict(
             name="command",
-            description="If you want to get info on a certain command, specify it now!",
+            description="If you want to get info on a certain command, specify it",
             type=3,
             required="false",
         ),
@@ -175,16 +162,7 @@ async def _help(ctx, category=None, command=None):
     prefixes = get_prefix(client, ctx.guild_id)
     prefix = prefixes[1]
     embed = None
-    cogs = list(client.cogs)
 
-    if not category is None:
-        if category in cogs:
-            embed = await help_cog(ctx, category, prefix)
-        elif category == "other":
-            embed = await help_cog(ctx, None, prefix)
-    if not embed is None:
-        await ctx.send(embed=embed)
-        embed = None
     if not command is None:
         embed = await help_command(ctx, command, prefix)
     if category is None and command is None:
@@ -484,91 +462,7 @@ async def spy(ctx, *, guild: discord.Guild):
     await ctx.send(embed=embed)
 
 
-
-
-'''
-@slash.subcommand(
-    guild_ids=[844842835495878697],
-    base="scratchapi",
-    name="login",
-    options=[
-        dict(
-            name="username",
-            description="The username of your Scratch account",
-            type=3,
-            required="true"
-        ),
-        dict(
-            name="password",
-            description="The password of your Scratch account",
-            type=3,
-            required="true"
-        )
-    ]
-)
-async def scratch_login(ctx, username, password):
-    try:
-        await ctx.defer(hidden=True)
-    except Exception:
-        pass
-
-    try:
-        scratch = scratchapi.ScratchUserSession(username, password, remember_password=False)
-    except Exception:
-        await ctx.send(f"Couldn't log in to **{username}** ⚠ Please make sure you entered the correct username / password.", hidden=True)
-    else:
-        if scratch.tools.verify_session() is True:
-            await ctx.send(f"Successfully logged in as **{username}** ✅", hidden=True)
-        else:
-            await ctx.send(f"The account **{username}** is banned! {emojis['ban']}", hidden=True)
-'''
 #news
-@slash.slash(
-    name="scratch",
-    description="Displays information from scratch.mit.edu",
-    options=[
-        dict(
-            name="page",
-            description="What page do you want to see?",
-            type=3,
-            required="true",
-            choices=[
-                create_choice(
-                    name="Scratch News",
-                    value="0"
-                ),
-                create_choice(
-                    name="Featured Projects",
-                    value="1"
-                ),
-                create_choice(
-                    name="Top loved",
-                    value="2"
-                ),
-                create_choice(
-                    name="Cloud game activity",
-                    value="3"
-                ),
-                create_choice(
-                    name="Curated projects",
-                    value="4"
-                )
-            ]
-        )
-    ]
-)
-async def _scratch(ctx, page):
-    await ctx.defer()
-    if int(page) == 0:
-        await scratch_news(ctx)
-    elif int(page) == 1:
-        await featured(ctx)
-    elif int(page) == 2:
-        await top_loved(ctx)
-    elif int(page) == 3:
-        await cloudgames(ctx)
-    elif int(page) == 4:
-        await curated(ctx)
 
 @client.group(aliases=["s"], brief="Displays info from scratch.mit.edu", description="Displays information from the Scratch website (scratch.mit.edu) on your server!")
 async def scratch(ctx):
@@ -584,31 +478,35 @@ def get_project_id(proj):
     for i in proj:
         if i.isnumeric():
             project_id += i
-    return int(project_id)
+    return project_id
 
-@scratch.command(aliases=["t"], brief="Shows you the thumbnail of a Scratch project")
+
+@scratch.command(aliases=["th"], brief="Shows you the thumbnail of a Scratch project")
 async def thumbnail(ctx, project):
     project_id = get_project_id(project)
     embed = discord.Embed(title="Thumbnail", color=get_client_color(ctx))
     embed.set_author(name="👩‍💻 Scratch Projects", url="https://scratch.mit.edu/")
     embed.set_footer(text="Data taken from cdn2.scratch.mit.edu")
-    embed.set_image(url=f"https://cdn2.scratch.mit.edu/get_image/project/{project_id}_480x360.png")
+    embed.set_image(url=f"https://cdn2.scratch.mit.edu/get_image/project/{project_id}_1000000x360.png")
     await ctx.message.reply(embed=embed)
 
 async def scratch_nfe(ctx, proj):
     project_id = get_project_id(proj)
-    message = await ctx.message.reply("Checking ...")
+    message = await ctx.message.reply(embed = discord.Embed(description = "**Checking ...**"))
     try:
+        project_id = int(project_id)
         nfe = requests.get(f"https://jeffalo.net/api/nfe/?project={project_id}")
         nfe = json.loads(nfe.text)
         if nfe["status"] == "safe":
-            await message.edit(content="🟢 This project is safe!")
+            embed = discord.Embed(description="Project Status: **Safe**", color=discord.Color.green())
         elif nfe["status"] == "notsafe":
-            await message.edit(content="🔴 This project was marked as unsafe (NFE).")
+            embed = discord.Embed(description="Project Status: **Unsafe / NFE**", color=discord.Color.red())
         else:
-            await message.edit(content="🟡 This project was not reviewed yet.")
+            embed = discord.Embed(description="Project Status: **Not reviewed**", color=discord.Color.gold())
+        embed.set_footer(text="😸 Data taken from jeffalo.net")
+        await message.edit(content=None, embed=embed)
     except Exception:
-        await message.edit(content="An error occurred! 😼 Please try again! You should make sure this project exists.")
+        await message.edit(content=None, embed=discord.Embed(description="**Meow! 😼 An error occurred!**", color = discord.Color.red()))
 
 async def scratch_news(ctx):
     news = requests.get(f"https://api.scratch.mit.edu/news/")
@@ -665,13 +563,40 @@ async def cloudgames(ctx):
 
     embed = get_cloud_game([108566337], "slither.io Scratch", embed)
     embed = get_cloud_game([12785898, 378507713], "Cloud Platformer Multiplayer Fun", embed)
+    embed = get_cloud_game([523967150, 432072522, 524390839], "Among Us Scratch", embed, author="TimMcCool")
     embed = get_cloud_game([478790208, 478797222], "Taco Burp | Cloud", embed)
-    embed = get_cloud_game([409593079, 409596803, 409686453], "Othello Online", embed, author="TimMcCool")
     embed = get_cloud_game([466980603], "Appel Multiplayer", embed, author="XShrunk")
     embed = get_cloud_game([443370138], "Pico's world (MMO)", embed, author="TimMcCool")
 
     await message.remove_reaction(emojis['loading'], client.user)
     await message.edit(embed=embed)
+
+#search
+@scratch.command(aliases=["s"], brief="Search up popular Scratch projects with this command")
+async def search(ctx, *, search_query):
+    await search(ctx, "popular", search_query)
+
+@scratch.command(aliases=["t"], brief="Search up trendy Scratch projects with this command")
+async def trending(ctx, *, search_query):
+    await search(ctx, "trending", search_query)
+
+@scratch.command(aliases=["r"], brief="Search up recent Scratch projects with this command")
+async def recent(ctx, *, search_query):
+    await search(ctx, "recent", search_query)
+
+async def search(ctx, mode, search_query):
+    results = requests.get(f"https://api.scratch.mit.edu/search/projects?limit=15&offset=0&language=en&mode={mode}&q={search_query}")
+    results = json.loads(results.text)
+    embed = discord.Embed(description=f"**```\nMode: {mode}```**", color = get_client_color(ctx))
+    embed.set_author(name="Project Search", icon_url="https://www.logolynx.com/images/logolynx/0b/0bdbd10ab2fa7096299f7c78e1ac55f5.png")
+    if len(results) == 0:
+        embed.description+="\n*Sorry, no projects found*"
+    else:
+        for proj in results:
+            embed.add_field(name=proj['title'][:30], value=f"by [@{proj['author']['username']}](https://scratch.mit.edu/users/{proj['author']['username']})\n*[Go to project](https://scratch.mit.edu/projects/{proj['id']})*\n{emojis['spacer']}")
+    await ctx.message.reply(embed=embed)
+
+
 
 #featured
 @scratch.command(aliases=["f"], brief="Shows recently featured projects")
@@ -693,6 +618,30 @@ async def featured(ctx):
 
     await ctx.send(embed=embed)
 
+
+#top loved
+@scratch.command(aliases=["comments", "cs"], brief="Searches up profiles comments using scratch-data.sly-little-fox.ru, an API for Scratch profile comments")
+@commands.cooldown(2, 3, commands.BucketType.user)
+async def commentsearch(ctx, *, search_query):
+    comments = requests.get(f"https://scratch-data.sly-little-fox.ru/api/v1/search?q={search_query}")
+    comments = json.loads(comments.text)
+
+    embed = discord.Embed(title="Search results", color=get_client_color(ctx))
+    embed.set_author(name="Comment Search", url="https://scratch-data.sly-little-fox.ru", icon_url="https://www.logolynx.com/images/logolynx/0b/0bdbd10ab2fa7096299f7c78e1ac55f5.png")
+
+    for comment in comments:
+        
+        #if not search_query in comment['content']:
+        #    break
+
+        embed.add_field(name=f"{comment['profile']}'s profile", value=f"*```✍️ Author: {comment['user']}\n📅 Date: {comment['time'][:-10]}```* **```\n{comment['content']}```**__[Link](https://scratch.mit.edu/users/{comment['profile']}/#{comment['id']})__", inline=False)
+        if len(embed) > 5999:
+            embed.remove_field(len(embed.fields)-1)
+            break
+
+    await ctx.message.reply(embed=embed)
+
+
 #top loved
 @scratch.command(aliases=["toploved", "tl"], brief="Shows projects that are currently top loved")
 @commands.cooldown(2, 3, commands.BucketType.user)
@@ -708,7 +657,7 @@ async def top_loved(ctx):
         embed.add_field(name=item['title'][0:20], value=f"Creator: [@{item['creator']}](https://scratch.mit.edu/users/{item['creator']})\nLoves: {item['love_count']}\n[View project](https://scratch.mit.edu/projects/{item['id']})")
 
     embed.set_author(name="❤️ Scratch Projects", url="https://scratch.mit.edu/")
-    embed.set_footer(text="Data taken from the Scratch API")
+    #embed.set_footer(text="Data taken from the Scratch API")
     embed.set_thumbnail(url="https://www.logolynx.com/images/logolynx/0b/0bdbd10ab2fa7096299f7c78e1ac55f5.png")
 
     await ctx.send(embed=embed)
@@ -735,32 +684,177 @@ async def curated(ctx):
 
 #profiles
 @scratch.command(aliases=["p"], brief="Shows a Scratch profile")
-@commands.cooldown(2, 3, commands.BucketType.user)
+@commands.cooldown(2, 1.5, commands.BucketType.user)
 async def profile(ctx, *, scratcher):
-    await profile(ctx, scratcher)
-
-async def profile(ctx, scratcher):
     try:
-        data = requests.get(f"https://api.scratch.mit.edu/users/{scratcher}")
-        data = json.loads(data.text)
-        embed = discord.Embed(title="Profile", color=get_client_color(ctx))
+        
+        embed, data, follower_count, stats = await profile(ctx, scratcher)
+        message = await ctx.send(
+            embed=embed,
+            components=[[
+            Button(style=ButtonStyle.blue, emoji="📊", label="Stats"),
+            Button(style=ButtonStyle.blue, emoji="🧑‍🤝‍🧑", label="Followers"),
+            Button(style=ButtonStyle.URL, label="View on Scratch", url=f"https://scratch.mit.edu/users/{scratcher}"),
+            ]]
+        )
+        profile_embed = embed
+        follower_embed = None
+        follower_offset = 0
+        print(follower_count)
 
-        embed.add_field(name="Country:", value=data['profile']['country'], inline=True)
-        embed.add_field(name="Joined at:", value=data['history']['joined'], inline=True)
-        if not data['profile']['bio'] == "":
-            embed.add_field(name="About me:", value="```"+data['profile']['bio']+"```", inline=False)
-        if not data['profile']['status'] == "":
-            embed.add_field(name="What I am working on:", value="```"+data['profile']['status']+"```", inline=False)
+        while True:
+            
+            try:
+                res = await client.wait_for("button_click")
+                if res.message == message:
 
-        embed.set_thumbnail(url=data['profile']['images']['90x90'])
-        embed.set_author(name="😸 "+data['username'], url=f"https://scratch.mit.edu/users/{data['username']}")
-        embed.set_footer(text="Data taken from the Scratch API")
+                    embed = discord.Embed(title=data['username'], color=get_client_color(ctx))
+                    embed.set_thumbnail(url=data['profile']['images']['90x90'])
 
-        await ctx.send(embed=embed)
+                    if res.component.label == "Stats":
+                        embed.set_author(name="📊 Stats")
+
+                        embed.add_field(name="Views:", value="```\n👁️ "+str(stats['statistics']['views'])+"```")
+                        embed.add_field(name="Loves:", value="```\n💕 "+str(stats['statistics']['loves'])+"```")
+                        embed.add_field(name="Favorites:", value="```\n⭐ "+str(stats['statistics']['favorites'])+"```")
+                        embed.add_field(name="Followers:", value="```\n👥 "+str(stats['statistics']['followers'])+"```")
+                        embed.add_field(name="Following:", value="```\n👥 "+str(stats['statistics']['following'])+"```")
+                        embed.add_field(name="Comments:", value="```\n💬 "+str(stats['statistics']['comments'])+"```")
+
+                        embed.add_field(name="Ranks (global):", value=f"```\n👁️ #{stats['statistics']['ranks']['views']}\n💕 #{stats['statistics']['ranks']['loves']}\n⭐ #{stats['statistics']['ranks']['favorites']}\n👥 #{stats['statistics']['ranks']['followers']}\n💬 #{stats['statistics']['ranks']['comments']}```")
+                        embed.add_field(name=f"Ranks (country - {stats['country']}):", value=f"```\n👁️ #{stats['statistics']['ranks']['country']['views']}\n💕 #{stats['statistics']['ranks']['country']['loves']}\n⭐ #{stats['statistics']['ranks']['country']['favorites']}\n👥 #{stats['statistics']['ranks']['country']['following']}\n💬 #{stats['statistics']['ranks']['country']['comments']}```")
+
+
+                        await res.respond(
+                            type=InteractionType.UpdateMessage,
+                            embed=embed,
+                            components=[[
+
+                            Button(style=ButtonStyle.blue, emoji="🗂️", label="Profile"),
+                            Button(style=ButtonStyle.blue, emoji="🧑‍🤝‍🧑", label="Followers"),
+
+                            Button(style=ButtonStyle.URL, label="View on ScratchStats", url=f"https://scratchstats.com/{scratcher}"),
+                            ]]
+                        )       
+
+                    if res.component.label == "Followers" or res.component.label == "◀" or res.component.label == "▶":
+                        if res.component.label == "◀":
+                            follower_offset -= 24 
+                            if follower_offset < 0:
+                                follower_offset = 0
+
+                        if res.component.label == "▶":
+                            follower_offset += 24
+                            if follower_offset < 0:
+                                follower_offset = 0
+
+                        if True:
+                            embed.set_author(name="👥 Followers")
+
+                            followers = requests.get(f"https://api.scratch.mit.edu/users/{scratcher}/followers?offset={follower_offset}&limit=24")
+                            followers = json.loads(followers.text)
+                            for item in followers:
+
+                                
+                                embed.add_field(name=item['username'], value=f"** **")
+                            embed.set_footer(text=f"Page {round(follower_offset/24) +1}")
+                            follower_embed = embed
+                        else:
+                            embed = follower_embed
+
+                        await res.respond(
+                            type=InteractionType.UpdateMessage,
+                            embed=embed,
+                            components=[[
+                            Button(style=ButtonStyle.red, label="◀"),
+                            Button(style=ButtonStyle.red, label="▶"),
+                            Button(style=ButtonStyle.blue, emoji="🗂️", label="Profile"),
+
+                            Button(style=ButtonStyle.blue, emoji="📊", label="Stats"),
+                            Button(style=ButtonStyle.URL, label="View on Scratch", url=f"https://scratch.mit.edu/users/{scratcher}/followers"),
+                            ]]
+                        )
+                    
+                        
+
+                    else:
+                        follower_offset = 0
+
+                    if res.component.label == "Profile":
+                        embed = profile_embed
+
+                        await res.respond(
+                            type=InteractionType.UpdateMessage,
+                            embed=embed,
+                            components=[[
+                            Button(style=ButtonStyle.blue, emoji="📊", label="Stats"),
+                            Button(style=ButtonStyle.blue, emoji="🧑‍🤝‍🧑", label="Followers"),
+                            Button(style=ButtonStyle.URL, label="View on Scratch", url=f"https://scratch.mit.edu/users/{scratcher}"),
+                            ]]
+                        )
+            except Exception:
+                continue
+    
+    
     except Exception:
         await ctx.send(
-            "The Scratch server is scratching its head! 😼 This user doesn't exist."
+              "**Error 404**\nThe Scratch server is scratching its head 😼"
         )
+
+async def profile(ctx, scratcher):
+    data = requests.get(f"https://api.scratch.mit.edu/users/{scratcher}")
+    data = json.loads(data.text)
+    try:
+        deleted = requests.head(f"https://scratch.mit.edu/site-api/comments/user/{scratcher}/")
+        deleted = not "200" in str(deleted)
+    except Exception:
+        deleted = "?"
+
+    try:
+        stats = requests.get(f"https://scratchdb.lefty.one/v3/user/info/{scratcher}", timeout=0.35)
+        stats = json.loads(stats.text)
+        stats_string = f"```\n👥 {stats['statistics']['followers']} | #{stats['statistics']['ranks']['followers']} world wide"
+        stats_string += f"\n💕 {stats['statistics']['loves']} | #{stats['statistics']['ranks']['loves']} world wide"
+        stats_string += f"\n👁️ {stats['statistics']['views']} | #{stats['statistics']['ranks']['views']} world wide```"
+
+    except Exception:
+        stats_string = False
+    
+    '''try:
+        followers = requests.get(f"https://api.scratch.mit.edu/users/{scratcher}/followers?offset=0&limit=3")
+        followers = json.loads(followers.text)
+        follower_string = "```"
+        for item in followers:
+            follower_string += f"\n• {item['username']}"
+        follower_string += "```"
+        if len(followers) == 0:
+            follower_string = False
+        
+    except Exception:
+        follower_string = False'''
+
+    embed = discord.Embed(title=data['username'], color=get_client_color(ctx))
+
+    embed.add_field(name="Country:", value=data['profile']['country'], inline=True)
+    embed.add_field(name="Joined at:", value=data['history']['joined'][:10], inline=True)
+    embed.add_field(name="Deleted?", value=str(deleted))
+    if not data['profile']['bio'] == "":
+        embed.add_field(name="About me:", value="```"+data['profile']['bio']+"```", inline=False)
+    if not data['profile']['status'] == "":
+        embed.add_field(name="What I am working on:", value="```"+data['profile']['status']+"```", inline=False)
+    if not stats_string is False:
+        embed.add_field(name="Summarily Stats:", value=stats_string, inline=False)
+
+
+    embed.set_thumbnail(url=data['profile']['images']['90x90'])
+    embed.set_author(name="👤 Profile")
+
+    try:
+        follower_count = int(stats['statistics']['followers'])
+    except Exception:
+        follower_count = 0
+
+    return embed, data, follower_count, stats
 
 #messages
 @scratch.command(aliases=["unread", "m"], brief="Shows a Scratcher's unread messages count")
@@ -770,9 +864,14 @@ async def messages(ctx, *, scratcher):
 
 async def messages(ctx, scratcher):
     try:
-        count = requests.get(f"https://api.scratch.mit.edu/users/{scratcher}/messages/count")
+        count = requests.get(
+            f"https://api.scratch.mit.edu/users/{scratcher}/messages/count",
+            headers = {
+                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'
+            }
+        )
         count = json.loads(count.text)['count']
-        await ctx.send(f"**{scratcher}** has **{count}** unread messages! :postbox:")
+        await ctx.send(f"**{scratcher}** has **{count:,}** unread messages! :postbox:")
     except Exception:
         await ctx.send(
             "The Scratch server is scratching its head! 😼 This user doesn't exist."
@@ -785,6 +884,15 @@ async def ping(ctx):
     await ctx.send(
         f"{ctx.message.author.mention} It took me **{round(client.latency * 1000)}ms** to answer! :clock: That's pretty fast, isn't it?"
     )
+
+
+@client.command(name="eval", hidden=True)
+@commands.is_owner()
+async def eval_cmd(ctx, *, code):
+    try:
+        await ctx.send(str(eval(code)))
+    except Exception:
+        await eval(code)
 
 
 @client.command(hidden=True, enabled=False, aliases=["poem"])
@@ -801,7 +909,7 @@ async def potionz(ctx):
 @slash.slash(name="invite", description="Add TimMcBot to your server!")
 async def _invite(ctx):
     invite = discord.Embed(
-        description="**[Invite link](https://discord.com/api/oauth2/authorize?client_id=800377812699447306&permissions=4294967287&scope=bot%20applications.commands)**",
+        description=f"**[Invite link]({invite_link})**",
         color=get_client_color(ctx),
     )
     invite.set_author(name="➕ Add me to your server!", icon_url=client.user.avatar_url)
@@ -813,7 +921,7 @@ async def _invite(ctx):
 )
 async def invite(ctx):
     invite = discord.Embed(
-        description="**[Invite link](https://discord.com/api/oauth2/authorize?client_id=800377812699447306&permissions=4294967287&scope=bot%20applications.commands)**",
+        description=f"**[Invite link]({invite_link})**",
         color=get_client_color(ctx),
     )
     invite.set_author(name="➕ Add me to your server!", icon_url=client.user.avatar_url)
@@ -851,14 +959,18 @@ async def dev(ctx):
 
 @client.command()
 async def api(ctx):
-    embed = discord.Embed(title="API", description="Fetch TimMcBot's data with HTTP requests and use them in your application!", color=get_client_color(ctx))
+    embed = discord.Embed(title="API", color=get_client_color(ctx))
     embed.set_author(name="TimMcBot", icon_url=client.user.avatar_url)
-    embed.add_field(name="Get the TimMcBot leaderboard", value="```timmcbot.1tim.repl.co/api/lb/?guild=[GUILD_ID]```", inline=False)
-    embed.add_field(name="Get all polls of a guild", value="```timmcbot.1tim.repl.co/api/polls/?guild=[GUILD_ID]```", inline=False)
-    embed.add_field(name="Get the TimMcBot prefixes that were set in the guild", value="```timmcbot.1tim.repl.co/api/prefixes/?guild=[GUILD_ID]```", inline=False)
-    embed.set_footer(text="⚠️ Warning: The API is currently in beta and not finished!\nMore endpoints will be added soon!")
-    await ctx.send(embed=embed)
 
+    embed.add_field(name="Get the server leaderboard", value="```timmcbot.1tim.repl.co/api/lb/?guild=<guild_id>```", inline=False)
+
+    embed.add_field(name="Get a list of all polls", value="```timmcbot.1tim.repl.co/api/polls/list/?guild=<guild_id>```", inline=False)
+
+    embed.add_field(name="Get the prefixes that were set", value="```timmcbot.1tim.repl.co/api/prefixes/?guild=<guild_id>```", inline=False)
+
+    embed.add_field(name="Get info on a giveaway", value="```timmcbot.1tim.repl.co/api/giveaway/?message=<msg_id>```", inline=False)
+    
+    await ctx.send(embed=embed)
 
 # errors:
 
@@ -1067,12 +1179,28 @@ async def on_guild_channel_update(before, after):
             await log.send("<@!731965572207870023> <@!844628822414589982> ⚠ **SOMEONE JUST MOVED A CHANNEL!** ⚠")
 '''
 
+leveling = {}
+
 @client.event
 async def on_ready():
+    DiscordComponents(client)
+    global leveling
+    
+    '''guild = client.get_guild(844124863231950848)
+    print(guild)
+    role = guild.get_role(846180761403916288)
+    print(role)
+    member = await guild.fetch_member(844628822414589982)
+    print(member)
+    await member.add_roles(role)#'''
+
+
+    #with open("json_files/leveling.json", "r") as d:
+    
+    #    db["leveling"] = dict(json.load(d))
+    #    leveling = db["leveling"]
+    
     print(f"\n{client.user.name} is now online!\n")
-
-
-
 
     '''
     guild = await client.fetch_guild(800008691289292821)
@@ -1113,9 +1241,6 @@ async def on_ready():
     with open("json_files/2048highscores.json", "w") as d:
         json.dump(dict(db["2048highscores"]), d, indent=4)
 
-    with open("json_files/globalchat.json", "w") as d:
-        json.dump(dict(db["globalchat"]), d, indent=4)
-    
     prefixes = dict(db["prefixes"])
     for key in list(prefixes.keys()):
         prefixes[key] = list(prefixes[key])
@@ -1156,6 +1281,9 @@ async def on_ready():
         rr[key] = dict(rr[key])
         for sub_key in list(rr[key].keys()):
             rr[key][sub_key] = dict(rr[key][sub_key])
+
+
+    db["leveling"] = leveling
 
     with open("json_files/rr.json", "w") as d:
         json.dump(rr, d, indent=4)
@@ -1230,14 +1358,13 @@ async def on_slash_command(ctx):
 
 @tasks.loop(seconds=5)
 async def save_data_on_db():
+    global leveling
     with open("json_files/2048highscores.json", "r") as d:
         db["2048highscores"] = dict(json.load(d))
-    with open("json_files/globalchat.json", "r") as d:
-        db["globalchat"] = dict(json.load(d))
     with open("json_files/prefixes.json", "r") as d:
         db["prefixes"] = dict(json.load(d))
-    with open("json_files/leveling.json", "r") as d:
-        db["leveling"] = dict(json.load(d))
+    db['leveling'] = leveling
+    
     with open("json_files/levelroles.json", "r") as d:
         db["levelroles"] = dict(json.load(d))
     with open("json_files/polls.json", "r") as d:
