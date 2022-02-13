@@ -16,10 +16,10 @@ import math
 from math import ceil
 import inspect
 import os
-import subprocess
 from replit import db
 import requests
 
+import subprocess
 import os
 
 
@@ -58,17 +58,17 @@ def get_prefix(client, message):
     try:
         if str(message.guild.id) in serverdata:
             prefixes = serverdata[str(message.guild.id)]
-            prefixes.insert(0, "<@!800377812699447306> ")
+            prefixes.insert(0, "<@!853970415080439828> ")
             return prefixes
         else:
-            return ["<@!800377812699447306> ", "+"]
+            return ["<@!853970415080439828> ", "+"]
     except AttributeError:
         if str(message) in serverdata:
             prefixes = serverdata[str(message)]
-            prefixes.insert(0, "<@!800377812699447306> ")
+            prefixes.insert(0, "<@!853970415080439828> ")
             return prefixes
         else:
-            return ["<@!800377812699447306> ", "+"]
+            return ["<@!853970415080439828> ", "+"]
 
 
 async def prefix_info(ctx, message):
@@ -76,9 +76,9 @@ async def prefix_info(ctx, message):
         serversettings = json.load(d)
     if str(ctx.guild.id) in serversettings:
         prefixes = serversettings[str(ctx.guild.id)]
-        prefixes.insert(0, "<@!800377812699447306> ")
+        prefixes.insert(0, "<@!853970415080439828> ")
     else:
-        prefixes = ["<@!800377812699447306>", "+"]
+        prefixes = ["<@!853970415080439828>", "+"]
     description = ""
     i = 0
     for prefix in prefixes:
@@ -109,8 +109,8 @@ with open("json_files/bans.json", "r") as b:
 
 invite_link = "https://discord.com/api/oauth2/authorize?client_id=853970415080439828&permissions=806112496&scope=bot%20applications.commands"
 emojis = dict(
-    spacer="<:spacer:854038785606942745>", #
-    blobchain="<a:blobchain:789959677856317450>",
+    spacer="<:spacer:884410681359749130>", #
+    blobchain="<a:blobchain:842891575151427605>",
     ban="<:ban_1:808677659805483079>",
     # checkmark = "<a:checkmark_1:808767689375612959>",
     checkmark="👌",
@@ -120,7 +120,7 @@ emojis = dict(
     f_in_the_chat="<:F_in_the_chat:796449160383561759>",
     tmb_icon="<:TimMcBot:822934684803268648>",
     info="<:info:823643485813866518>",
-    loading="<a:loading:854449780084178984>"
+    loading="<:Loading:784452793665978388>"
 )
 assets = dict(
     tmc_server_animated="https://cdn.discordapp.com/attachments/818455648903626752/820791308032671764/ezgif-6-0fe2bac545b1.gif",
@@ -170,10 +170,37 @@ async def _help(ctx, category=None, command=None):
     if not embed is None:
         await ctx.send(embed=embed)
 
+@slash.slash(
+    name="minedaria",
+    description="get info on a player",
+    options=[
+        dict(
+            name="player",
+            description="the player name",
+            type=3,
+            required="true"
+        )
+    ]
+)
+async def _minedaria(ctx, player):
+    minedaria = json.loads(requests.get("https://world.minedaria.com/up/world/world/1632942598224").text)
+    try:
+        for player_object in minedaria['players']:
+            if player_object['account'] == player:
+                player_data = player_object
+        embed = discord.Embed(title=player_data['account'], color=discord.Color.gold())
+        embed.set_author(name="⚔️ Minedaria ⚔️")
+        embed.add_field(name="Health", value="**"+str(player_data['health']/2)+" / 10 :heart:**", inline=False)
+        embed.add_field(name="Position", value=f"```x {player_data['x']} | y {player_data['y']} | z {player_data['z']}```", inline=False)
+        await ctx.send(None, embed=embed)
+    except Exception:
+        await ctx.send(":crossed_swords: Player not found ⚔")
+
+
 
 @client.command(brief="Shows this message")
 async def help(ctx, *, command=""):
-    if ctx.prefix == "<@!800377812699447306> ":
+    if ctx.prefix == "<@!853970415080439828> ":
         prefixes = get_prefix(client, ctx.message)
         prefix = prefixes[1]
     else:
@@ -211,7 +238,7 @@ async def help_home(ctx, prefix):
             )
     notes = [
         "There are **slash commands** too! Type / to see them.",
-        "Do you like TimMcBot? [**Vote for it** on top.gg!](https://top.gg/bot/800377812699447306/vote)",
+        "Do you like TimMcBot? [**Vote for it** on top.gg!](https://top.gg/bot/853970415080439828/vote)",
         "Want to support TimMcBot? [**Vote** on discordbotlist.com!](https://discordbotlist.com/bots/timmcbot/upvote)",
    ]
     embed.description += "\n\n :small_orange_diamond: "+random.choice(notes)
@@ -410,7 +437,7 @@ async def add(ctx, *, prefix):
             prefixes = serversettings[str(ctx.guild.id)]
         else:
             prefixes = ["+"]
-        if prefix == "<@!800377812699447306> " or prefix in prefixes:
+        if prefix == "<@!853970415080439828> " or prefix in prefixes:
             await ctx.send(f"{prefix} is already a prefix!")
         elif len(prefixes) > 13:
             await ctx.send("This server **reached the limit** of TimMcBot prefixes! (15) 🚫")
@@ -425,7 +452,7 @@ async def add(ctx, *, prefix):
 @prefix.command(brief="Admins can remove a prefix with this command")
 @commands.has_permissions(manage_guild=True)
 async def remove(ctx, *, prefix):
-    if prefix == "<@!800377812699447306> ":
+    if prefix == "<@!853970415080439828> ":
         await ctx.send(f"The prefix {prefix} can't be removed!")
     else:
         with open("json_files/prefixes.json", "r") as d:
@@ -932,7 +959,7 @@ async def invite(ctx):
 )
 async def vote(ctx):
     invite = discord.Embed(
-        description="**[Vote on top.gg](https://top.gg/bot/800377812699447306/vote)**\n**[Vote on discordbotlist.com](https://discordbotlist.com/bots/timmcbot)**",
+        description="**[Vote on top.gg](https://top.gg/bot/853970415080439828/vote)**\n**[Vote on discordbotlist.com](https://discordbotlist.com/bots/timmcbot)**",
         color=get_client_color(ctx),
     )
     invite.set_author(name="🗳️ Want to support TimMcBot?", icon_url=client.user.avatar_url)
@@ -978,7 +1005,7 @@ async def error_handler(ctx, error, prefix, *, slash=False):
     ErrMessage = discord.Embed(color=discord.Color.red())
     ErrContent = None
     if isinstance(error, commands.CommandNotFound) and slash is False:
-        if ctx.prefix == "<@!800377812699447306> ":
+        if ctx.prefix == "<@!853970415080439828> ":
             await prefix_info(ctx, ctx.message)
         return
             
@@ -1137,7 +1164,7 @@ async def on_message(message):
             
             else:
 
-                if message.content == "<@!800377812699447306>":
+                if message.content == "<@!853970415080439828>":
 
                     # SEND PREFIX INFO
                     await prefix_info(message.channel, message)
@@ -1185,7 +1212,14 @@ leveling = {}
 async def on_ready():
     DiscordComponents(client)
     global leveling
-    
+
+    '''guild = client.get_guild(751545225498984609)
+    print(guild)
+    member = await guild.fetch_member(853970415080439828)
+    print(member)
+    await member.edit(reason="Max ist doof", nick="TimMcBot der allerechte")'''
+
+
     '''guild = client.get_guild(844124863231950848)
     print(guild)
     role = guild.get_role(846180761403916288)
@@ -1229,9 +1263,10 @@ async def on_ready():
     #await guild.leave()
 
     
-    #channel = await client.fetch_channel(810610920577040414)
+    #channel = await client.fetch_channel(844124863231950851)
     #invite = await channel.create_invite()
     #print(str(invite))
+    #https://discord.com/invite/g6yE7grq7n
 
     server_count = len(client.guilds)
     await client.change_presence(

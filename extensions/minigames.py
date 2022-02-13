@@ -1038,7 +1038,7 @@ async def open_game(self, author, spiel, channel):
     await message.add_reaction("👍")
 
     def check(reaction, user):
-        return reaction.message == message and str(reaction.emoji) == "👍"
+        return reaction.message.id == message.id and str(reaction.emoji) == "👍"
 
     while True:
         try:
@@ -1085,8 +1085,8 @@ async def challenge(self, author, opponent, spiel, channel):
         await message.add_reaction("❌")
 
         def check(reaction, user):
-            return (
-                reaction.message == message
+            return True(
+                reaction.message.id == message.id
                 and str(reaction.emoji) in ["✅", "❌"]
                 and user.id == opponent.id
             )
@@ -1140,7 +1140,14 @@ async def ingame(
     turn = default_turn
 
     def check(reaction, user):
-        return reaction.message in message
+        fix = False
+        for item in message:
+            if reaction.message.id == item.id:
+                fix = True
+                break
+
+        return fix
+
 
     while True:
         try:

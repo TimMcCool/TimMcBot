@@ -168,7 +168,7 @@ def leaderboard(guild, style):
 
 
 def run():
-    app.run(host="0.0.0.0", port=random.randint(2000, 9000))
+    app.run(host="0.0.0.0", port=1080)
 
 leveling = {}
 def keep_alive():
@@ -177,3 +177,9 @@ def keep_alive():
     global client
     server = Thread(target=run)
     server.start()
+
+import requests
+ip_adress = requests.get("https://api.my-ip.io/ip").text
+port = "1080"
+
+print(ip_adress+":"+port)

@@ -296,6 +296,103 @@
                 "Upvotes",
                 "Downvotes"
             ]
+        },
+        "888447637781610526": {
+            "name": "Which is epic",
+            "strict": false,
+            "url": "https://discord.com/channels/740155791834873877/740240781805092924/888447637781610526",
+            "author": 723971496107573328,
+            "ended": false,
+            "channel": 740240781805092924,
+            "options": [
+                "\ud83e\uddca",
+                "\ud83e\uddca",
+                "\ud83e\uddca",
+                "\ud83e\uddca",
+                "\ud83e\uddca",
+                "\ud83e\uddca",
+                "\ud83e\uddca",
+                "\ud83e\uddca",
+                "\ud83e\uddca",
+                "\ud83e\uddca",
+                "\ud83e\uddca",
+                "\ud83e\uddca",
+                "\ud83e\uddca",
+                "\ud83e\uddca",
+                "\ud83e\uddca",
+                "\ud83e\uddca",
+                "\ud83e\uddca",
+                "\ud83e\uddca",
+                "\ud83e\uddca"
+            ]
+        },
+        "888479501611307058": {
+            "name": "How many hours does a day have?",
+            "strict": false,
+            "url": "https://discord.com/channels/740155791834873877/748976910515830855/888479501611307058",
+            "author": 682913228531302480,
+            "ended": false,
+            "channel": 748976910515830855,
+            "options": [
+                "24",
+                "12+12",
+                "6+6+6+6",
+                "3+3+3+3+3+3+3+3",
+                "1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1"
+            ]
+        },
+        "921929701914726410": {
+            "name": "What's the latest you've ever went to bed?",
+            "strict": false,
+            "url": "https://discord.com/channels/740155791834873877/748976910515830855/921929701914726410",
+            "author": 682913228531302480,
+            "ended": false,
+            "channel": 748976910515830855,
+            "options": [
+                "12am"
+            ]
+        },
+        "928098856749637672": {
+            "name": "Add back TimMcBot to top.gg and dbl?",
+            "strict": false,
+            "url": "https://discord.com/channels/740155791834873877/752090712173969439/928098856749637672",
+            "author": 844628822414589982,
+            "ended": false,
+            "channel": 752090712173969439,
+            "options": [
+                "Yes",
+                "Yes, and rename the bot",
+                "No"
+            ]
+        },
+        "928327908622237747": {
+            "name": "add advertising channel?",
+            "strict": false,
+            "url": "https://discord.com/channels/740155791834873877/879468163266387989/928327908622237747",
+            "author": 844628822414589982,
+            "ended": false,
+            "channel": 879468163266387989,
+            "options": [
+                "Yes",
+                "Yes, but it is unlocked at timmcbot level 2",
+                "No"
+            ]
+        },
+        "938361780885925950": {
+            "name": "how",
+            "strict": false,
+            "url": "https://discord.com/channels/740155791834873877/748976910515830855/938361780885925950",
+            "author": 711945740775194704,
+            "ended": true,
+            "channel": 748976910515830855,
+            "options": [
+                "are",
+                "you",
+                "|",
+                "fine",
+                "|",
+                "bad"
+            ]
         }
     },
     "811073585740644352": {
@@ -1118,6 +1215,18 @@
                 "Upvotes",
                 "Downvotes"
             ]
+        },
+        "934189511078973450": {
+            "name": "** **",
+            "strict": false,
+            "url": "https://discord.com/channels/844124863231950848/859257635089547354/934189511078973450",
+            "author": 844628822414589982,
+            "ended": false,
+            "channel": 859257635089547354,
+            "options": [
+                "Middlesex",
+                "Sussex"
+            ]
         }
     },
     "790477442195652608": {
@@ -1223,6 +1332,37 @@
             "channel": 854381487390195735,
             "options": [
                 "BOTS?"
+            ]
+        }
+    },
+    "873007372426149888": {
+        "935067028014891038": {
+            "name": "Is Jensen cringe?",
+            "strict": false,
+            "url": "https://discord.com/channels/873007372426149888/909099732373209138/935067028014891038",
+            "author": 918276615853707264,
+            "ended": false,
+            "channel": 909099732373209138,
+            "options": [
+                "yes",
+                "no"
+            ]
+        },
+        "942386051094298635": {
+            "name": "Is <@\u200b!918276615853707264> cringe?",
+            "strict": false,
+            "url": "https://discord.com/channels/873007372426149888/909099732373209138/942386051094298635",
+            "author": 820027661647872070,
+            "ended": true,
+            "channel": 909099732373209138,
+            "options": [
+                "yeah",
+                "nah",
+                "amogus",
+                "why r u still here",
+                "im jensen who is cringe",
+                "he is cringe cause he pretends to be griffpatch and tommyinnit",
+                "sus"
             ]
         }
     }

@@ -116,7 +116,7 @@ class fun(commands.Cog):
                 )
             )
 
-    @commands.command(aliases=["f-in-the-chat", "f"])
+    @commands.command(aliases=["f-in-the-chat", "f"], enabled=False)
     @commands.cooldown(3, 30, commands.BucketType.user)
     async def pressf(self, ctx, *, occurrence):
         message = await ctx.send(
