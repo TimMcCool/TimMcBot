@@ -128,7 +128,7 @@ class utility(commands.Cog):
             await ctx.send("This server has no icon :confused:")
 
 
-    @commands.command(brief="Revokes an invite link")
+    @commands.command(description="Revokes an invite link")
     @commands.has_permissions(manage_guild=True)
     async def revoke(self, ctx, invite_link, *, reason=None):
         try:
@@ -172,12 +172,12 @@ class utility(commands.Cog):
     async def _lock(self, ctx, channel: discord.TextChannel=None, role: discord.Role=None):
         await lock(self, ctx, channel, role)
 
-    @commands.command(brief="Locks a channel for @everyone or a specific role", description="Denies the **`Send messages`** permission for **`@everyone`** or a specific role.\nDepending on the permission settings of the channel, some members still may be able to send messages.")
+    @commands.command(description="Denies the **`Send messages`** permission for **`@everyone`** or a specific role.\nDepending on the permission settings of the channel, some members still may be able to send messages.")
     @commands.has_permissions(manage_channels=True)
     async def lock(self, ctx, channel: discord.TextChannel=None, *, role: discord.Role=None):
         await lock(self, ctx, channel, role)
 
-    @commands.command(brief="Locks down all channels of a category for @everyone")
+    @commands.command(description="Locks down all channels of a category for @everyone")
     @commands.has_permissions(manage_channels=True)
     async def lockdown(self, ctx, *, category: discord.CategoryChannel):
         role = ctx.guild.default_role
@@ -345,37 +345,37 @@ class utility(commands.Cog):
             ),
             dict(
                 name = "footer",
-                description = "The footer text of the embed",
+                description="shown at the bottom",
                 type = 3,
                 required = "false"
             ),
             dict(
                 name = "footer_icon_url",
-                description = "The icon url of the embed's footer",
+                description = "shown at the bottom",
                 type = 3,
                 required = "false"
             ),
             dict(
                 name = "author",
-                description = "The author of the embed (shown on the top)",
+                description = "shown on the top",
                 type = 3,
                 required = "false"
             ),
             dict(
                 name = "author_icon_url",
-                description = "The icon url of the embed's author",
+                description = "shown on the top",
                 type = 3,
                 required = "false"
             ),
             dict(
                 name = "thumbnail_url",
-                description = "The URL of the embed's thumbnail (small at the top right)",
+                description = "small at the top right",
                 type = 3,
                 required = "false"
             ),
             dict(
                 name = "image_url",
-                description = "The URL of the embed's image (big at the bottom)",
+                description = "big at the bottom",
                 type = 3,
                 required = "false"
             )
@@ -480,13 +480,13 @@ class utility(commands.Cog):
 
             embed=discord.Embed(title="Reaction role", description=f"{emoji} • {role.mention}", color=discord.Color.random())
             embed.set_footer(text="React to get the role!")
-            message = await ctx.send(emojis['loading'])
+            message = await ctx.send(embed=discord.Embed(title="Loading"))
             try:
                 await message.add_reaction(emoji)
             except discord.errors.HTTPException:
                 await message.edit(content="You didn't enter a valid emoji!")
             else:
-                await message.edit(content=None, embed=embed)
+                await message.edit(content="", embed=embed)
                 if not str(ctx.guild.id) in rr:
                     rr[str(ctx.guild.id)] = {}
                 rr[str(ctx.guild.id)][str(message.id)] = {emoji : role.id}

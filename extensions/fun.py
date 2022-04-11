@@ -1,4 +1,4 @@
-import discord
+import nextcord
 import random
 from random import randint
 from discord.ext import commands, tasks
@@ -32,7 +32,7 @@ class fun(commands.Cog):
     async def virus(self, ctx):
         await ctx.message.reply("https://tenor.com/view/coronavirus-pandemic-virus-germs-gif-16660839")
 
-    @commands.command()
+    @commands.command(brief="This will add a neat blur effect to your icon!")
     @commands.bot_has_permissions(attach_files=True)
     @commands.cooldown(1, 2.7, commands.BucketType.user)
     async def blur(self, ctx, *, user: discord.User=None):
@@ -49,7 +49,7 @@ class fun(commands.Cog):
 
         os.remove(f'temp_files/blur{user.id}.png')
 
-    @commands.command(aliases=["colourful"])
+    @commands.command(aliases=["colourful"], brief="This will saturate your icon!")
     @commands.bot_has_permissions(attach_files=True)
     @commands.cooldown(1, 2.7, commands.BucketType.user)
     async def colorful(self, ctx, *, user: discord.User=None):
@@ -67,7 +67,7 @@ class fun(commands.Cog):
 
         os.remove(f'temp_files/color{user.id}.png')
 
-    @commands.command(aliases=["blend"])
+    @commands.command(brief="This will merge the icon's of two users", aliases=["blend"])
     @commands.bot_has_permissions(attach_files=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def merge(self, ctx, user1 : discord.User, user2: discord.User):
@@ -116,9 +116,13 @@ class fun(commands.Cog):
                 )
             )
 
-    @commands.command(aliases=["f-in-the-chat", "f"], enabled=False)
+    @commands.command(aliases=["f-in-the-chat", "f"])
     @commands.cooldown(3, 30, commands.BucketType.user)
     async def pressf(self, ctx, *, occurrence):
+
+        if "@" in occurrence:
+            await ctx.send("._.")
+            return
         message = await ctx.send(
             f"**{occurrence}** - React with {emojis['f_in_the_chat']} to pay respects!"
         )
@@ -280,32 +284,36 @@ class fun(commands.Cog):
 
     @commands.command(name="8ball", aliases=["ask"])
     async def eightball(self, ctx, *, question=None):
-        options = [
-            # yes
-            "As I see it, yes.",
-            ":thumbsup:",
-            "Yes",
-            "Most likely.",
-            "YESSSSSSSS!!!",
-            "Without a doubt.",
-            # no
-            "No - definitely not.",
-            ":thumbsdown:",
-            "I don't think so.",
-            "No",
-            "Nope",
-            "My reply is no.",
-            # others
-            "Cannot predict now.",
-            "Maybe",
-            "idk",
-            "I'm confused. :confused:",
-            "Go and ask someone else.",
-            "Better not tell you now.",
-            "I won't ever tell you :laughing:",
-            "Concentrate and ask again.",
-            "I'm tired. :sleeping: Please ask me again later.",
-        ]
+        if question is None:
+            await ctx.send("You didn't ask me anything!")
+            return
+        else:
+            options = [
+                # yes
+                "As I see it, yes.",
+                ":thumbsup:",
+                "Yes",
+                "Most likely.",
+                "YESSSSSSSS!!!",
+                "Without a doubt.",
+                # no
+                "No - definitely not.",
+                ":thumbsdown:",
+                "I don't think so.",
+                "No",
+                "Nope",
+                "My reply is no.",
+                # others
+                "Cannot predict now.",
+                "Maybe",
+                "idk",
+                "I'm confused. :confused:",
+                "Go and ask someone else.",
+                "Better not tell you now.",
+                "I won't ever tell you :laughing:",
+                "Concentrate and ask again.",
+                "I'm tired. :sleeping: Please ask me again later.",
+            ]
         if "@everyone" in question or "@here" in question:
             await ctx.message.reply("**The magic 🎱 says:**\n> STOP PINGING! :angry:")
         else:

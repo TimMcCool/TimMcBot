@@ -1,8 +1,8 @@
 # imports and installs
 
-import discord
-from discord.ext import commands, tasks
-from discord.ext.commands import MissingPermissions, CheckFailure
+import nextcord
+from nextcord.ext import commands, tasks
+from nextcord.ext.commands import MissingPermissions, CheckFailure
 import time, datetime
 import random
 from random import randint
@@ -46,9 +46,9 @@ def get_client_color(ctx):
     try:
         color = ctx.guild.get_member(client.user.id).color
         if str(color) == "#000000":
-            color = discord.Color.teal()
+            color = nextcord.Color.teal()
     except Exception:
-        color = discord.Color.teal()
+        color = nextcord.Color.teal()
     return color
 
 
@@ -84,7 +84,7 @@ async def prefix_info(ctx, message):
     for prefix in prefixes:
         i += 1
         description += f"{i}. {prefix}\n"
-    embed = discord.Embed(
+    embed = nextcord.Embed(
         title=f"{len(prefixes)} Prefixes",
         description=description,
         color=get_client_color(ctx),
@@ -97,8 +97,8 @@ async def prefix_info(ctx, message):
 # init bot
 client = commands.Bot(
     command_prefix=get_prefix,
-    intents=discord.Intents.all(),
-    allowed_mentions=discord.AllowedMentions(roles=False, users=True, everyone=False),
+    intents=nextcord.Intents.all(),
+    allowed_mentions=nextcord.AllowedMentions(roles=False, users=True, everyone=False),
 )
 slash = SlashCommand(client, sync_commands=True)
 client.owner_id = 844628822414589982 
@@ -107,7 +107,7 @@ client.remove_command("help")
 with open("json_files/bans.json", "r") as b:
     bans = json.load(b)
 
-invite_link = "https://discord.com/api/oauth2/authorize?client_id=853970415080439828&permissions=806112496&scope=bot%20applications.commands"
+invite_link = "https://nextcord.com/oauth2/authorize?client_id=853970415080439828&permissions=534525635697&scope=bot%20applications.commands"
 emojis = dict(
     spacer="<:spacer:884410681359749130>", #
     blobchain="<a:blobchain:842891575151427605>",
@@ -169,7 +169,7 @@ async def _help(ctx, category=None, command=None):
         embed = await help_home(ctx, prefix)
     if not embed is None:
         await ctx.send(embed=embed)
-
+'''
 @slash.slash(
     name="minedaria",
     description="get info on a player",
@@ -188,7 +188,7 @@ async def _minedaria(ctx, player):
         for player_object in minedaria['players']:
             if player_object['account'] == player:
                 player_data = player_object
-        embed = discord.Embed(title=player_data['account'], color=discord.Color.gold())
+        embed = nextcord.Embed(title=player_data['account'], color=nextcord.Color.gold())
         embed.set_author(name="⚔️ Minedaria ⚔️")
         embed.add_field(name="Health", value="**"+str(player_data['health']/2)+" / 10 :heart:**", inline=False)
         embed.add_field(name="Position", value=f"```x {player_data['x']} | y {player_data['y']} | z {player_data['z']}```", inline=False)
@@ -197,6 +197,7 @@ async def _minedaria(ctx, player):
         await ctx.send(":crossed_swords: Player not found ⚔")
 
 
+'''
 
 @client.command(brief="Shows this message")
 async def help(ctx, *, command=""):
@@ -222,8 +223,8 @@ async def help(ctx, *, command=""):
 async def help_home(ctx, prefix):
     cogs = list(client.cogs)
     cogs.append("other")
-    embed = discord.Embed(
-        description=f"Enter `{prefix}help <command>` to get info on a certain command",
+    embed = nextcord.Embed(
+        description=f"Enter `{prefix}help [command]` to get info on a certain command",
         color=get_client_color(ctx),
     )
     embed.set_author(name="Help", icon_url=client.user.avatar_url)
@@ -238,10 +239,29 @@ async def help_home(ctx, prefix):
             )
     notes = [
         "There are **slash commands** too! Type / to see them.",
-        "Do you like TimMcBot? [**Vote for it** on top.gg!](https://top.gg/bot/853970415080439828/vote)",
-        "Want to support TimMcBot? [**Vote** on discordbotlist.com!](https://discordbotlist.com/bots/timmcbot/upvote)",
-   ]
-    embed.description += "\n\n :small_orange_diamond: "+random.choice(notes)
+    ]
+    try:
+        command = random.choice(list(client.commands))
+
+        if not command.enabled or command.hidden:
+            embed.description += "\n\n :small_orange_diamond: "+random.choice(notes)
+        else:
+
+            params, alts = "", None
+            for item in command.clean_params:
+    
+                if str(command.clean_params[item].default) == "<class 'inspect._empty'>":
+                    if str(command.clean_params[item].kind) == "VAR_POSITIONAL":
+                        params = f"{params} ({item})"
+                    else:
+                        params = f"{params} [{item}]"
+                else:
+                    params = f"{params} ({item})"
+
+                
+            embed.description += "\n\n :small_orange_diamond: **Featured command: `"+ctx.prefix+command.name+params+"`**\n*Command info: "+str(command.brief)+"*"
+
+    except Exception as e: print(e)
     return embed
 
 
@@ -253,58 +273,69 @@ async def help_cog(ctx, cog_name, prefix):
     else:
         name = cog_name
 
-    embed = discord.Embed(description="", color=get_client_color(ctx))
+    embed = nextcord.Embed(description="", color=get_client_color(ctx))
     embed.set_author(name=name, icon_url=client.user.avatar_url)
-    embed.set_footer(text="<Required arguments> | (Optional arguments)")
+    embed.set_footer(text="[Required arguments] | (Optional arguments)")
 
+    cog_commands = []
     for command in client.commands:
         if command.cog is None:
             this_cog_name = None
         else:
             this_cog_name = command.cog.qualified_name
-        params = ""
         if this_cog_name == cog_name and not command.hidden:
-            for item in list(command.clean_params):
-                if str(command.clean_params[item].default) == "<class 'inspect._empty'>":
-                    if str(command.clean_params[item].kind) == "VAR_POSITIONAL":
-                        params = f"{params} ({item})"
-                    else:
-                        params = f"{params} <{item}>"
-                else:
+            cog_commands.append(command)
+
+    cog_commands = sorted(cog_commands, key=lambda k : 1 if '#sticky' in k.description else 0)
+    cog_commands.reverse()
+        
+    for command in cog_commands:
+        params = ""
+        for item in list(command.clean_params):
+            if str(command.clean_params[item].default) == "<class 'inspect._empty'>":
+                if str(command.clean_params[item].kind) == "VAR_POSITIONAL":
                     params = f"{params} ({item})"
+                else:
+                    params = f"{params} [{item}]"
+            else:
+                params = f"{params} ({item})"
 
-            commandinfo = ""
-            if not command.brief is None:
-                commandinfo += "➣ "+ command.brief 
+        commandinfo = ""
+        if not command.brief is None:
+            commandinfo += "➣ "+ command.brief 
+        try:
+            subcommands = None
+            commands = command.commands
             try:
-                subcommands = None
-                for subcmd in command.commands:
-                    subcmd_params = ""
+                commands = sorted(commands, key = lambda k: k.name)
+            except Exception as e: print(e)
+            for subcmd in commands:
+                subcmd_params = ""
 
-                    for item in subcmd.clean_params:
-                        
-                        if str(subcmd.clean_params[item].default) == "<class 'inspect._empty'>":
-                            if str(subcmd.clean_params[item].kind) == "VAR_POSITIONAL":
-                                subcmd_params = f"{subcmd_params} ({item})"
-                            else:
-                                subcmd_params = f"{subcmd_params} <{item}>"
-                        else:
+                for item in subcmd.clean_params:
+                    
+                    if str(subcmd.clean_params[item].default) == "<class 'inspect._empty'>":
+                        if str(subcmd.clean_params[item].kind) == "VAR_POSITIONAL":
                             subcmd_params = f"{subcmd_params} ({item})"
-
-                    if subcommands == None:
-                        subcommands = "`" + prefix + subcmd.qualified_name + subcmd_params + "`"
+                        else:
+                            subcmd_params = f"{subcmd_params} <{item}>"
                     else:
-                        subcommands = (
-                            subcommands + ", `" + prefix + subcmd.qualified_name + subcmd_params + "`"
-                        )
-                commandinfo += "\n➣ Subcommands: " + subcommands
-            except Exception:
-                pass
-            embed.description += f"\n**{prefix + command.qualified_name + params}**\n"
-            if not commandinfo == "":
-                embed.description += commandinfo+"\n"
+                        subcmd_params = f"{subcmd_params} ({item})"
+
+                if subcommands == None:
+                    subcommands = "`" + prefix + subcmd.qualified_name + subcmd_params + "`"
+                else:
+                    subcommands = (
+                        subcommands + ", `" + prefix + subcmd.qualified_name + subcmd_params + "`"
+                    )
+            commandinfo += "\n➣ Subcommands: " + subcommands
+        except Exception:
+            pass
+        embed.description += f"\n**{prefix + command.qualified_name + params}**\n"
+        if not commandinfo == "":
+            embed.description += commandinfo+"\n"
     embed.description += (
-        f"\n*Enter `{prefix}help <command>` to get info on a certain command*"
+        f"\n*Enter `{prefix}help [command]` to get info on a certain command*"
     )
     return embed
 
@@ -323,7 +354,7 @@ async def help_command(ctx, command, prefix):
                 if str(command.clean_params[item].kind) == "VAR_POSITIONAL":
                     params = f"{params} ({item})"
                 else:
-                    params = f"{params} <{item}>"
+                    params = f"{params} [{item}]"
             else:
                 params = f"{params} ({item})"
 
@@ -338,18 +369,18 @@ async def help_command(ctx, command, prefix):
                     alts = f"{prefix}{command.full_parent_name} {alt}{params}"
                 else:
                     alts = f"{alts}, {prefix}{command.full_parent_name} {alt}{params}"
-        embed = discord.Embed(
+        embed = nextcord.Embed(
             title=f"`{prefix}{command.qualified_name}{params}`",
             color=get_client_color(ctx),
         )
         content = ""
         if not alts is None:
             content += "**Alternate:**\n```" + alts + "```\n"
-        if command.description == "":
+        if command.description.replace("#sticky", "") == "":
             if not command.brief is None:
                 content += "**Description:\n**" + command.brief + "\n\n"
         else:
-            content += "**Description:**\n" + command.description + "\n\n"
+            content += "**Description:**\n" + command.description.replace("#sticky", "") + "\n\n"
         if not command.usage is None:
             content = (content + command.usage).format(prefix) + "\n"
         if not command.help is None:
@@ -365,7 +396,12 @@ async def help_command(ctx, command, prefix):
 
         subcommands = None
         try:
-            for subcmd in command.commands:
+            commands = command.commands
+            try:
+                commands = sorted(commands, key = lambda k: k.name)
+            except Exception as e: print(e)
+
+            for subcmd in commands:
                 subcmd_params = ""
                 for item in subcmd.clean_params:
 
@@ -407,7 +443,7 @@ async def reload(ctx):
 @commands.has_permissions(manage_guild=True)
 async def setup(ctx):
     color = ctx.guild.get_member(client.user.id).top_role.color
-    embed = discord.Embed(
+    embed = nextcord.Embed(
         title="Step 1",
         description=f"**{ctx.author.name}, please answer the following questions!** You have 5 minutes for each question.",
         color=get_client_color(ctx),
@@ -416,7 +452,7 @@ async def setup(ctx):
     await ctx.send(embed=embed)
 
 
-@client.group(brief="Shows the bot's prefixes", aliases=["prefixes"])
+@client.group(brief="Get and change the prefixes", description="#sticky", aliases=["prefixes"])
 async def prefix(ctx):
     if ctx.invoked_subcommand is None:
         await prefix_info(ctx, ctx.message)
@@ -480,8 +516,8 @@ async def remove(ctx, *, prefix):
 
 @client.command(hidden=True)
 #@commands.is_owner()
-async def spy(ctx, *, guild: discord.Guild):
-    embed = discord.Embed(title="Channels", color=get_client_color(ctx))
+async def spy(ctx, *, guild: nextcord.Guild):
+    embed = nextcord.Embed(title="Channels", color=get_client_color(ctx))
     embed.set_author(name=guild.name, icon_url=guild.icon_url)
     for channel in guild.channels:
         embed.add_field(name=channel.name, value="** **")
@@ -494,8 +530,10 @@ async def spy(ctx, *, guild: discord.Guild):
 @client.group(aliases=["s"], brief="Displays info from scratch.mit.edu", description="Displays information from the Scratch website (scratch.mit.edu) on your server!")
 async def scratch(ctx):
     if ctx.invoked_subcommand is None:
-        await scratch_news(ctx)
+        embed = await help_command(ctx, "scratch", ctx.prefix)
+        await ctx.send(embed=embed)
 
+        
 @scratch.command(brief="Tells whether a project is marked as nfe / unsafe")
 async def nfe(ctx, project):
     await scratch_nfe(ctx, project)
@@ -511,7 +549,7 @@ def get_project_id(proj):
 @scratch.command(aliases=["th"], brief="Shows you the thumbnail of a Scratch project")
 async def thumbnail(ctx, project):
     project_id = get_project_id(project)
-    embed = discord.Embed(title="Thumbnail", color=get_client_color(ctx))
+    embed = nextcord.Embed(title="Thumbnail", color=get_client_color(ctx))
     embed.set_author(name="👩‍💻 Scratch Projects", url="https://scratch.mit.edu/")
     embed.set_footer(text="Data taken from cdn2.scratch.mit.edu")
     embed.set_image(url=f"https://cdn2.scratch.mit.edu/get_image/project/{project_id}_1000000x360.png")
@@ -519,26 +557,26 @@ async def thumbnail(ctx, project):
 
 async def scratch_nfe(ctx, proj):
     project_id = get_project_id(proj)
-    message = await ctx.message.reply(embed = discord.Embed(description = "**Checking ...**"))
+    message = await ctx.message.reply(embed = nextcord.Embed(description = "**Checking ...**"))
     try:
         project_id = int(project_id)
         nfe = requests.get(f"https://jeffalo.net/api/nfe/?project={project_id}")
         nfe = json.loads(nfe.text)
         if nfe["status"] == "safe":
-            embed = discord.Embed(description="Project Status: **Safe**", color=discord.Color.green())
+            embed = nextcord.Embed(description="Project Status: **Safe**", color=nextcord.Color.green())
         elif nfe["status"] == "notsafe":
-            embed = discord.Embed(description="Project Status: **Unsafe / NFE**", color=discord.Color.red())
+            embed = nextcord.Embed(description="Project Status: **Unsafe / NFE**", color=nextcord.Color.red())
         else:
-            embed = discord.Embed(description="Project Status: **Not reviewed**", color=discord.Color.gold())
+            embed = nextcord.Embed(description="Project Status: **Not reviewed**", color=nextcord.Color.gold())
         embed.set_footer(text="😸 Data taken from jeffalo.net")
         await message.edit(content=None, embed=embed)
     except Exception:
-        await message.edit(content=None, embed=discord.Embed(description="**Meow! 😼 An error occurred!**", color = discord.Color.red()))
+        await message.edit(content=None, embed=nextcord.Embed(description="**Meow! 😼 An error occurred!**", color = nextcord.Color.red()))
 
 async def scratch_news(ctx):
     news = requests.get(f"https://api.scratch.mit.edu/news/")
     news = json.loads(news.text)
-    embed = discord.Embed(title="Recent site updates", color=get_client_color(ctx))
+    embed = nextcord.Embed(title="Recent site updates", color=get_client_color(ctx))
 
     for item in news[0:5]:
         embed.add_field(name=item['headline'], value=f"{item['copy']}\n[More ...]({item['url']})")
@@ -580,7 +618,7 @@ async def cloudgames(ctx):
     await cloudgames(ctx)
 
 async def cloudgames(ctx):
-    embed = discord.Embed(title="Loading ...", color=get_client_color(ctx))
+    embed = nextcord.Embed(title="Loading ...", color=get_client_color(ctx))
     embed.set_author(name="☁️ Scratch cloud projects", icon_url="https://www.logolynx.com/images/logolynx/0b/0bdbd10ab2fa7096299f7c78e1ac55f5.png")
     message = await ctx.send(embed=embed)
     await message.add_reaction(emojis['loading'])
@@ -599,22 +637,22 @@ async def cloudgames(ctx):
     await message.edit(embed=embed)
 
 #search
-@scratch.command(aliases=["s"], brief="Search up popular Scratch projects with this command")
-async def search(ctx, *, search_query):
+@scratch.command(aliases=["popular", "s"], brief="Search up popular Scratch projects with this command")
+async def search_p(ctx, *, search_query):
     await search(ctx, "popular", search_query)
 
-@scratch.command(aliases=["t"], brief="Search up trendy Scratch projects with this command")
-async def trending(ctx, *, search_query):
+@scratch.command(aliases=["trending", "t"], brief="Search up trendy Scratch projects with this command")
+async def search_t(ctx, *, search_query):
     await search(ctx, "trending", search_query)
 
-@scratch.command(aliases=["r"], brief="Search up recent Scratch projects with this command")
-async def recent(ctx, *, search_query):
+@scratch.command(aliases=["recent","r"], brief="Search up recent Scratch projects with this command")
+async def search_r(ctx, *, search_query):
     await search(ctx, "recent", search_query)
 
 async def search(ctx, mode, search_query):
     results = requests.get(f"https://api.scratch.mit.edu/search/projects?limit=15&offset=0&language=en&mode={mode}&q={search_query}")
     results = json.loads(results.text)
-    embed = discord.Embed(description=f"**```\nMode: {mode}```**", color = get_client_color(ctx))
+    embed = nextcord.Embed(description=f"**```\nMode: {mode}```**", color = get_client_color(ctx))
     embed.set_author(name="Project Search", icon_url="https://www.logolynx.com/images/logolynx/0b/0bdbd10ab2fa7096299f7c78e1ac55f5.png")
     if len(results) == 0:
         embed.description+="\n*Sorry, no projects found*"
@@ -634,7 +672,7 @@ async def featured(ctx):
 async def featured(ctx):
     featured = requests.get(f"https://api.scratch.mit.edu/proxy/featured")
     featured = json.loads(featured.text)["community_featured_projects"]
-    embed = discord.Embed(title="Recently featured", color=get_client_color(ctx))
+    embed = nextcord.Embed(title="Recently featured", color=get_client_color(ctx))
 
     for item in featured[0:9]:
         embed.add_field(name=item['title'][0:20], value=f"Creator: [@{item['creator']}](https://scratch.mit.edu/users/{item['creator']})\nLoves: {item['love_count']}\n[View project](https://scratch.mit.edu/projects/{item['id']})")
@@ -647,13 +685,13 @@ async def featured(ctx):
 
 
 #top loved
-@scratch.command(aliases=["comments", "cs"], brief="Searches up profiles comments using scratch-data.sly-little-fox.ru, an API for Scratch profile comments")
+@scratch.command(enabled=False, hidden=True, aliases=["comments", "cs"], brief="Searches up profiles comments using scratch-data.sly-little-fox.ru, an API for Scratch profile comments")
 @commands.cooldown(2, 3, commands.BucketType.user)
 async def commentsearch(ctx, *, search_query):
     comments = requests.get(f"https://scratch-data.sly-little-fox.ru/api/v1/search?q={search_query}")
     comments = json.loads(comments.text)
 
-    embed = discord.Embed(title="Search results", color=get_client_color(ctx))
+    embed = nextcord.Embed(title="Search results", color=get_client_color(ctx))
     embed.set_author(name="Comment Search", url="https://scratch-data.sly-little-fox.ru", icon_url="https://www.logolynx.com/images/logolynx/0b/0bdbd10ab2fa7096299f7c78e1ac55f5.png")
 
     for comment in comments:
@@ -678,7 +716,7 @@ async def top_loved(ctx):
 async def top_loved(ctx):
     tl = requests.get(f"https://api.scratch.mit.edu/proxy/featured")
     tl = json.loads(tl.text)["community_most_loved_projects"]
-    embed = discord.Embed(title="Top loved", color=get_client_color(ctx))
+    embed = nextcord.Embed(title="Top loved", color=get_client_color(ctx))
 
     for item in tl[0:20]:
         embed.add_field(name=item['title'][0:20], value=f"Creator: [@{item['creator']}](https://scratch.mit.edu/users/{item['creator']})\nLoves: {item['love_count']}\n[View project](https://scratch.mit.edu/projects/{item['id']})")
@@ -698,7 +736,7 @@ async def curated(ctx):
 async def curated(ctx):
     c = requests.get(f"https://api.scratch.mit.edu/proxy/featured")
     c = json.loads(c.text)["curator_top_projects"]
-    embed = discord.Embed(title="Curated", description=f"The current front page curator is [@{c[0]['curator_name']}](https://scratch.mit.edu/users/{c[0]['curator_name']})! Today, they are curating the following projects:", color=get_client_color(ctx))
+    embed = nextcord.Embed(title="Curated", description=f"The current front page curator is [@{c[0]['curator_name']}](https://scratch.mit.edu/users/{c[0]['curator_name']})! Today, they are curating the following projects:", color=get_client_color(ctx))
 
     for item in c[0:5]:
         embed.add_field(name=item['title'][0:20], value=f"Creator: [@{item['creator']}](https://scratch.mit.edu/users/{item['creator']})\nLoves: {item['love_count']}\n[View project](https://scratch.mit.edu/projects/{item['id']})")
@@ -735,7 +773,7 @@ async def profile(ctx, *, scratcher):
                 res = await client.wait_for("button_click")
                 if res.message == message:
 
-                    embed = discord.Embed(title=data['username'], color=get_client_color(ctx))
+                    embed = nextcord.Embed(title=data['username'], color=get_client_color(ctx))
                     embed.set_thumbnail(url=data['profile']['images']['90x90'])
 
                     if res.component.label == "Stats":
@@ -860,7 +898,7 @@ async def profile(ctx, scratcher):
     except Exception:
         follower_string = False'''
 
-    embed = discord.Embed(title=data['username'], color=get_client_color(ctx))
+    embed = nextcord.Embed(title=data['username'], color=get_client_color(ctx))
 
     embed.add_field(name="Country:", value=data['profile']['country'], inline=True)
     embed.add_field(name="Joined at:", value=data['history']['joined'][:10], inline=True)
@@ -922,21 +960,25 @@ async def eval_cmd(ctx, *, code):
         await eval(code)
 
 
+@client.command(brief="Invite to support server")
+async def support(ctx):
+    await ctx.send("🙋 **Invite to support server:**\nnextcord.gg/XdS2keyQk8\n\nThe bot is developed by `-Tim-#3280`")
+
 @client.command(hidden=True, enabled=False, aliases=["poem"])
 async def potionz(ctx):
     await ctx.send(
-        embed=discord.Embed(
+        embed=nextcord.Embed(
             title="Potionz",
             description="Potionz is lacking awesomeness.\nIt brings users helplessness.\nMy goodness, it brought me sadness!\nHow're you going to enhance this evil business?\n\n*This amazing poem was written by the Scratcher @icmy123 and modified by @TimMcCool*",
-            color=discord.Color.green(),
+            color=nextcord.Color.green(),
         )
     )
 
 
-@slash.slash(name="invite", description="Add TimMcBot to your server!")
+@slash.slash(name="invite", description="Add me to your server!")
 async def _invite(ctx):
-    invite = discord.Embed(
-        description=f"**[Invite link]({invite_link})**",
+    invite = nextcord.Embed(
+        description=f"**[Click here to invite]({invite_link})**",
         color=get_client_color(ctx),
     )
     invite.set_author(name="➕ Add me to your server!", icon_url=client.user.avatar_url)
@@ -944,34 +986,26 @@ async def _invite(ctx):
     
 @client.command(
     brief="Add me to your server!",
-    description="Run the command to add me to your server!",
 )
 async def invite(ctx):
-    invite = discord.Embed(
-        description=f"**[Invite link]({invite_link})**",
+    invite = nextcord.Embed(
+        description=f"**[Click here to invite]({invite_link})**",
         color=get_client_color(ctx),
     )
     invite.set_author(name="➕ Add me to your server!", icon_url=client.user.avatar_url)
     await ctx.send(embed=invite)
 
 @client.command(
-    brief="Vote for me on top.gg!"
+    brief="Vote for me on top.gg!",
+    hidden=True,
+    disabled=True,
 )
 async def vote(ctx):
-    invite = discord.Embed(
+    invite = nextcord.Embed(
         description="**[Vote on top.gg](https://top.gg/bot/853970415080439828/vote)**\n**[Vote on discordbotlist.com](https://discordbotlist.com/bots/timmcbot)**",
         color=get_client_color(ctx),
     )
     invite.set_author(name="🗳️ Want to support TimMcBot?", icon_url=client.user.avatar_url)
-    await ctx.send(embed=invite)
-
-@client.command()
-async def status(ctx):
-    invite = discord.Embed(
-        description="**[Status page](https://stats.uptimerobot.com/GzPzwhJ5KD)**",
-        color=get_client_color(ctx),
-    )
-    invite.set_author(name="📈 TimMcBot status", icon_url=client.user.avatar_url)
     await ctx.send(embed=invite)
 
 @client.command(aliases=["log"], hidden=True)
@@ -986,7 +1020,7 @@ async def dev(ctx):
 
 @client.command()
 async def api(ctx):
-    embed = discord.Embed(title="API", color=get_client_color(ctx))
+    embed = nextcord.Embed(title="API", color=get_client_color(ctx))
     embed.set_author(name="TimMcBot", icon_url=client.user.avatar_url)
 
     embed.add_field(name="Get the server leaderboard", value="```timmcbot.1tim.repl.co/api/lb/?guild=<guild_id>```", inline=False)
@@ -1002,7 +1036,7 @@ async def api(ctx):
 # errors:
 
 async def error_handler(ctx, error, prefix, *, slash=False):
-    ErrMessage = discord.Embed(color=discord.Color.red())
+    ErrMessage = nextcord.Embed(color=nextcord.Color.red())
     ErrContent = None
     if isinstance(error, commands.CommandNotFound) and slash is False:
         if ctx.prefix == "<@!853970415080439828> ":
@@ -1080,7 +1114,7 @@ async def error_handler(ctx, error, prefix, *, slash=False):
             params = f"{params} <{item}>"
         ErrContent = f":bulb: **How to use this command:** `{prefix}{ctx.command.qualified_name}{params}`"
     elif isinstance(error, commands.CommandInvokeError):
-        if isinstance(error.original, discord.Forbidden):
+        if isinstance(error.original, nextcord.Forbidden):
             ErrMessage.title = error.original.text
             ErrContent = f"I don't have the permissions that I need to run your command."
         else:
@@ -1151,16 +1185,16 @@ async def on_message(message):
 
                 # LOG DM
 
-                embed = discord.Embed(
+                embed = nextcord.Embed(
                     title="Direct Message to TimMcBot",
                     description=message.content,
-                    color=discord.Colour.gold(),
+                    color=nextcord.Colour.gold(),
                 )
                 embed.set_author(
                     name=str(message.author), icon_url=message.author.avatar_url
                 )
                 embed.set_footer(text=f"User {message.author.id}")
-                Webhook("https://discord.com/api/webhooks/833734042193100870/v7DHtWZw-5YY4odYXKZudzPLIBlpVNJDlxp4LEPAlFBHGg1GOCp9-WAhKPF4LkoP6n-l").send(embed=embed)
+                Webhook("https://nextcord.com/api/webhooks/833734042193100870/v7DHtWZw-5YY4odYXKZudzPLIBlpVNJDlxp4LEPAlFBHGg1GOCp9-WAhKPF4LkoP6n-l").send(embed=embed)
             
             else:
 
@@ -1266,11 +1300,11 @@ async def on_ready():
     #channel = await client.fetch_channel(844124863231950851)
     #invite = await channel.create_invite()
     #print(str(invite))
-    #https://discord.com/invite/g6yE7grq7n
+    #https://nextcord.com/invite/g6yE7grq7n
 
     server_count = len(client.guilds)
     await client.change_presence(
-        activity=discord.Activity(type=discord.ActivityType.watching, name=f"+help | {server_count} servers")
+        activity=nextcord.Activity(type=nextcord.ActivityType.watching, name=f"+help | {server_count} servers")
     )
 
     with open("json_files/2048highscores.json", "w") as d:
@@ -1339,13 +1373,13 @@ async def on_ready():
             print(channel)
             #webhook = await channel.create_webhook(name="-Tim-")
             #print(webhook.url)
-    chilly_dragon_webhook = "https://discord.com/api/webhooks/828997712086827098/uG9Hvnfpgee6Wp_SvUYJIGr8DdKRNVdj8M51H8Oz98hMbyv0RKbNIUF2bc38M2HCMRzs"
-    test_webhook = "https://discord.com/api/webhooks/828741183622479912/-rz0PNJN-K8PON40q_peXQlRaqG8lkwxMCK_Idh__UhPiMvdfCh9PhRDW6hh2E7hqhAd"
+    chilly_dragon_webhook = "https://nextcord.com/api/webhooks/828997712086827098/uG9Hvnfpgee6Wp_SvUYJIGr8DdKRNVdj8M51H8Oz98hMbyv0RKbNIUF2bc38M2HCMRzs"
+    test_webhook = "https://nextcord.com/api/webhooks/828741183622479912/-rz0PNJN-K8PON40q_peXQlRaqG8lkwxMCK_Idh__UhPiMvdfCh9PhRDW6hh2E7hqhAd"
     
-    embed=discord.Embed(
+    embed=nextcord.Embed(
         title=":warning: WARNING :warning:",
         description="You just got **PINGED!**",
-        color=discord.Color.teal()
+        color=nextcord.Color.teal()
     )
     embed.set_image(url="https://cdn.discordapp.com/avatars/718811967342772285/f14f4f3916b31537f947f06d7038cce0.webp?size=1024")
     embed.set_footer(text="Did I scare you? O_O")
@@ -1367,14 +1401,14 @@ async def on_command(ctx):
 async def on_guild_join(guild):
     server_count = len(client.guilds)
     await client.change_presence(
-        activity=discord.Activity(type=discord.ActivityType.watching, name=f"+help | {server_count} servers")
+        activity=nextcord.Activity(type=nextcord.ActivityType.watching, name=f"+help | {server_count} servers")
     )
 
 @client.event
 async def on_guild_remove(guild):
     server_count = len(client.guilds)
     await client.change_presence(
-        activity=discord.Activity(type=discord.ActivityType.watching, name=f"+help | {server_count} servers")
+        activity=nextcord.Activity(type=nextcord.ActivityType.watching, name=f"+help | {server_count} servers")
     )
 
 

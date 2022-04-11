@@ -393,6 +393,30 @@
                 "|",
                 "bad"
             ]
+        },
+        "962097302258999326": {
+            "name": "Do you like TimMcBot's new look?",
+            "strict": true,
+            "url": "https://discord.com/channels/740155791834873877/752090712173969439/962097302258999326",
+            "author": 844628822414589982,
+            "ended": false,
+            "channel": 752090712173969439,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
+        },
+        "962097467137065013": {
+            "name": "Do you like TimMcBot's new look?",
+            "strict": false,
+            "url": "https://discord.com/channels/740155791834873877/752090712173969439/962097467137065013",
+            "author": 844628822414589982,
+            "ended": false,
+            "channel": 752090712173969439,
+            "options": [
+                "Upvotes",
+                "Downvotes"
+            ]
         }
     },
     "811073585740644352": {
@@ -1363,6 +1387,61 @@
                 "im jensen who is cringe",
                 "he is cringe cause he pretends to be griffpatch and tommyinnit",
                 "sus"
+            ]
+        },
+        "942565673169748069": {
+            "name": "What team are you?",
+            "strict": false,
+            "url": "https://discord.com/channels/873007372426149888/873029429985681459/942565673169748069",
+            "author": 810336621198835723,
+            "ended": false,
+            "channel": 873029429985681459,
+            "options": [
+                "LA Rams",
+                "Cincinnati Bengals",
+                "I\u2019m not routing for any particular team",
+                "What\u2019s the Superbowl?"
+            ]
+        },
+        "943433000941654016": {
+            "name": "Never Gonna Give You Up",
+            "strict": false,
+            "url": "https://discord.com/channels/873007372426149888/920046153972723742/943433000941654016",
+            "author": 820027661647872070,
+            "ended": false,
+            "channel": 920046153972723742,
+            "options": [
+                "never",
+                "gonna",
+                "sus",
+                "amogus"
+            ]
+        },
+        "946990583308750891": {
+            "name": "Should I Livestream gamemaking on Sunday?",
+            "strict": true,
+            "url": "https://discord.com/channels/873007372426149888/873029429985681459/946990583308750891",
+            "author": 810336621198835723,
+            "ended": false,
+            "channel": 873029429985681459,
+            "options": [
+                "yes",
+                "no",
+                "I won\u2019t be able to be there"
+            ]
+        }
+    },
+    "962061025551736884": {
+        "962069976045486210": {
+            "name": "hi",
+            "strict": false,
+            "url": "https://discord.com/channels/962061025551736884/962061026206035990/962069976045486210",
+            "author": 844628822414589982,
+            "ended": true,
+            "channel": 962061026206035990,
+            "options": [
+                "Upvotes",
+                "Downvotes"
             ]
         }
     }

@@ -204,7 +204,7 @@ class leveling(commands.Cog):
             await rankcard(ctx, user, False)
 
     @commands.command(
-        brief="Shows the rank card of a user", help="Users don't get XP for TimMcBot commands and to prevent spam, users can only gain XP once every minute.", aliases=["r", "ranking", "rang"]
+        brief="Show's your rank and XP", help="Users don't get XP for TimMcBot commands and to prevent spam, users can only gain XP once every minute.", aliases=["r", "ranking", "rang"]
     )
     async def rank(self, ctx, *, user: discord.User=None):
         if user is None:

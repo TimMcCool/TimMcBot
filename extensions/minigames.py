@@ -636,7 +636,7 @@ class minigames(commands.Cog):
 
     @commands.command(
         help="If you don't mention an opponent, an open game anyone can join will be started.",
-        description="Play tictactoe against a server member! \nThis command starts a local tictactoe game.",
+        description="Play tictactoe against a server member! \nThis command starts a local tictactoe game.#sticky",
         aliases=["tic-tac-toe"],
     )
     @commands.bot_has_permissions(manage_messages=True)
@@ -695,7 +695,7 @@ class minigames(commands.Cog):
 
     @commands.command(
         help="If you don't mention an opponent, an open game anyone can join will be started.",
-        description="Play connect4 against a server member!\nThis command starts a local connect4 game.",
+        description="Play connect4 against a server member!\nThis command starts a local connect4 game.#sticky",
         aliases=["connect-4", "viergewinnt", "4gewinnt"],
     )
     @commands.bot_has_permissions(manage_messages=True)

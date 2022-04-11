@@ -754,7 +754,7 @@ class giveaways(commands.Cog):
     @commands.command(
         help="If you have permission to use slash commands, you can also use type `/giveaway`!",
         brief="Create a neat giveaway",
-        description="Starts the process to create a giveaway.",
+        description="Starts the process to create a giveaway.#sticky",
         aliases=["giveaway", "gstart"],
     )
     @commands.bot_has_permissions(manage_messages=True)
